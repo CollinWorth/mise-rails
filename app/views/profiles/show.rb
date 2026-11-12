@@ -13,8 +13,8 @@ class Views::Profiles::Show < Views::Base
         ActionForm(action: profile_path, method: :patch) do
           Stack do
             ErrorMessages(record: @user)
-            Field(label: "Name", name: "user[name]", value: @user.name)
-            Field(label: "Email", name: "user[email_address]", type: :email, value: @user.email_address)
+            Field(label: "Name", name: "user[name]", value: @user.name, autocomplete: "name")
+            Field(label: "Email", name: "user[email_address]", type: :email, value: @user.email_address, autocomplete: "username", autocapitalize: "none", autocorrect: "off")
             Button(type: :submit) { "Save" }
           end
         end
@@ -28,8 +28,8 @@ class Views::Profiles::Show < Views::Base
       CardContent do
         ActionForm(action: password_path, method: :patch) do
           Stack do
-            Field(label: "Current password", name: "current_password", type: :password)
-            Field(label: "New password", name: "password", type: :password)
+            Field(label: "Current password", name: "current_password", type: :password, autocomplete: "current-password")
+            Field(label: "New password", name: "password", type: :password, autocomplete: "new-password")
             Button(type: :submit) { "Update password" }
           end
         end

@@ -5,8 +5,8 @@ class Views::Sessions::New < Views::Base
       CardContent do
         ActionForm(action: session_path) do
           Stack do
-            Field(label: "Email", name: "email_address", type: :email, required: true, autofocus: true)
-            Field(label: "Password", name: "password", type: :password, required: true)
+            Field(label: "Email", name: "email_address", type: :email, required: true, autofocus: true, autocomplete: "username", autocapitalize: "none", autocorrect: "off")
+            Field(label: "Password", name: "password", type: :password, required: true, autocomplete: "current-password")
             Button(type: :submit) { "Sign in" }
             Link(href: new_registration_path) { "Create an account" }
           end

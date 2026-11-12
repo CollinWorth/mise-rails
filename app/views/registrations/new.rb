@@ -10,9 +10,9 @@ class Views::Registrations::New < Views::Base
         ActionForm(action: registration_path) do
           Stack do
             ErrorMessages(record: @user)
-            Field(label: "Name", name: "user[name]", value: @user.name, required: true)
-            Field(label: "Email", name: "user[email_address]", type: :email, value: @user.email_address, required: true)
-            Field(label: "Password (6+ characters)", name: "user[password]", type: :password, required: true)
+            Field(label: "Name", name: "user[name]", value: @user.name, required: true, autocomplete: "name")
+            Field(label: "Email", name: "user[email_address]", type: :email, value: @user.email_address, required: true, autocomplete: "username", autocapitalize: "none", autocorrect: "off")
+            Field(label: "Password (6+ characters)", name: "user[password]", type: :password, required: true, autocomplete: "new-password")
             Button(type: :submit) { "Sign up" }
             Link(href: new_session_path) { "Already have an account?" }
           end

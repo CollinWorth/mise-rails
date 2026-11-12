@@ -49,7 +49,7 @@ class Views::PlannedMeals::New < Views::Base
     end
 
     def times_field
-      Field(label: "Times (scales the grocery list)", name: "planned_meal[multiplier]", id: "planned_meal_multiplier", type: :number, value: 1, min: 1)
+      Field(label: "Times (scales the grocery list)", name: "planned_meal[multiplier]", id: "planned_meal_multiplier", type: :number, value: 1, min: 1, inputmode: "numeric")
     end
 
     def choice(label, **attrs)

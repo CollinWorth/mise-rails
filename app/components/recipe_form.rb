@@ -14,9 +14,9 @@ class Components::RecipeForm < Components::Base
           field(:tags, "Tags")
         end
         Row do
-          field(:prep_time, "Prep (min)", type: :number)
-          field(:cook_time, "Cook (min)", type: :number)
-          field(:servings, "Servings", type: :number)
+          field(:prep_time, "Prep (min)", type: :number, inputmode: "numeric")
+          field(:cook_time, "Cook (min)", type: :number, inputmode: "numeric")
+          field(:servings, "Servings", type: :number, inputmode: "numeric")
         end
         FormField do
           FormFieldLabel(for: "recipe_image") { "Photo" }
