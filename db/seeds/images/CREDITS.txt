@@ -1,0 +1,20 @@
+apple-pie.jpg: File:Apple cake with vanilla ice cream 2.jpg by W.carter (CC0) https://commons.wikimedia.org/wiki/File:Apple_cake_with_vanilla_ice_cream_2.jpg
+banana-bread.jpg: File:Banana bread slices.jpg by Shisma (CC BY 4.0) https://commons.wikimedia.org/wiki/File:Banana_bread_slices.jpg
+beef-stew.jpg: File:Beef stew 2.jpg by 3steph14 (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Beef_stew_2.jpg
+beef-tacos.jpg: File:001 Tacos de carnitas, carne asada y al pastor.jpg by Larry Miller (CC BY-SA 2.0) https://commons.wikimedia.org/wiki/File:001_Tacos_de_carnitas,_carne_asada_y_al_pastor.jpg
+caesar-salad.jpg: File:Caesar Salad - Purezza 2023-11-22.jpg by Andy Li (CC0) https://commons.wikimedia.org/wiki/File:Caesar_Salad_-_Purezza_2023-11-22.jpg
+chicken-noodle-soup.jpg: File:Chicken with Noodles Soup - Noodles Soup 2023-10-24.jpg by Andy Li (CC0) https://commons.wikimedia.org/wiki/File:Chicken_with_Noodles_Soup_-_Noodles_Soup_2023-10-24.jpg
+chicken-tikka-masala.jpg: File:Chicken Tikka Masala KellySue.JPG by Kelly Sue (CC BY 2.0) https://commons.wikimedia.org/wiki/File:Chicken_Tikka_Masala_KellySue.JPG
+chocolate-chip-cookies.jpg: File:Choc-Chip-Cookie.jpg by Evan-Amos (Public domain) https://commons.wikimedia.org/wiki/File:Choc-Chip-Cookie.jpg
+fried-rice.jpg: File:Pineapple fried rice at Banana Leaf in Milpitas, California.jpg by Grendelkhan (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Pineapple_fried_rice_at_Banana_Leaf_in_Milpitas,_California.jpg
+greek-salad.jpg: File:Greek salad and Tzatziki.jpg by Paasikivi (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Greek_salad_and_Tzatziki.jpg
+guacamole.jpg: File:Guacamole IMGP1271.jpg by Nikodem Nijaki (CC BY-SA 3.0) https://commons.wikimedia.org/wiki/File:Guacamole_IMGP1271.jpg
+lasagna.jpg: File:Meaty Lasagna 8of8 (8736299782).jpg by Breville USA (CC BY 2.0) https://commons.wikimedia.org/wiki/File:Meaty_Lasagna_8of8_(8736299782).jpg
+mac-and-cheese.jpg: File:Flickr qmnonic 123431456--Kraft Dinner and veggie dogs.jpg by Matt MacGillivray from Toronto, Ontario, Canada (CC BY 2.0) https://commons.wikimedia.org/wiki/File:Flickr_qmnonic_123431456--Kraft_Dinner_and_veggie_dogs.jpg
+margherita-pizza.jpg: File:Margherita Originale.JPG by Mario56 (CC BY-SA 3.0) https://commons.wikimedia.org/wiki/File:Margherita_Originale.JPG
+pad-thai.jpg: File:Phat Thai kung Chang Khien street stall.jpg by Takeaway (CC BY-SA 3.0) https://commons.wikimedia.org/wiki/File:Phat_Thai_kung_Chang_Khien_street_stall.jpg
+pancakes.jpg: File:Pancakes with Walnuts.png by Anna31415 (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Pancakes_with_Walnuts.png
+shakshuka.jpg: File:Shakshuka by Calliopejen1.jpg by Calliopejen1 (CC BY-SA 3.0) https://commons.wikimedia.org/wiki/File:Shakshuka_by_Calliopejen1.jpg
+spaghetti-carbonara.jpg: File:Espaguetis carbonara.jpg by Javier Somoza (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Espaguetis_carbonara.jpg
+tomato-soup.jpg: File:Tomato soup.jpg by unknown (CC BY-SA 2.0) https://commons.wikimedia.org/wiki/File:Tomato_soup.jpg
+vegetable-stir-fry.jpg: File:Stir fried mixed vegetables.jpg by CNEcija12345 (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Stir_fried_mixed_vegetables.jpg

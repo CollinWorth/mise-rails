@@ -1,0 +1,76 @@
+class Recipe < ApplicationRecord
+  belongs_to :user
+  belongs_to :original, class_name: "Recipe", optional: true
+  has_many :versions, -> { where(public: true, modified: true) }, class_name: "Recipe", foreign_key: :original_id, dependent: :nullify
+  has_many :ingredients, -> { order(:position) }, dependent: :destroy
+  has_many :likes, dependent: :destroy
+  has_many :ratings, dependent: :destroy
+  has_many :comments, -> { order(:created_at) }, dependent: :destroy
+  has_many :planned_meals, dependent: :destroy
+  has_one_attached :image do |attachable|
+    attachable.variant :card, resize_to_fill: [ 640, 360 ]
+    attachable.variant :large, resize_to_limit: [ 1200, 1200 ]
+  end
+
+  accepts_nested_attributes_for :ingredients, allow_destroy: true, reject_if: ->(attrs) { attrs["name"].blank? }
+
+  # Set when importing from a URL; the image is downloaded on save.
+  attr_accessor :image_url
+
+  ACCEPTED_IMAGE_TYPES = %w[image/jpeg image/png image/webp image/gif].freeze
+  MAX_IMAGE_SIZE = 10.megabytes
+
+  validates :name, presence: true
+  validate :image_is_a_photo
+
+  before_validation :attach_remote_image, on: :create, if: -> { image_url.present? && !image.attached? }
+
+  before_update :flag_modified, if: -> { original_id? }
+
+  # Recipes other people can discover: public originals, not saved copies.
+  scope :published, -> { where(public: true, original_id: nil) }
+  scope :visible_to, ->(user) { where(public: true).or(where(user:)) }
+  scope :newest, -> { order(id: :desc) }
+  scope :search, ->(query) { where("recipes.name LIKE :q OR recipes.tags LIKE :q OR recipes.cuisine LIKE :q", q: "%#{sanitize_sql_like(query.strip)}%") if query.present? }
+
+  # A saved copy shares ratings with the recipe it came from.
+  def rated_recipe = original || self
+
+  def average_rating
+    values = rated_recipe.ratings.map(&:value)
+    (values.sum.to_f / values.size).round(1) if values.any?
+  end
+
+  def liked_by?(user) = likes.exists?(user:)
+  def rating_by(user) = rated_recipe.ratings.find_by(user:)&.value
+
+  def steps = instructions.to_s.split(/\n+/).map(&:strip).compact_blank
+  def total_time = prep_time.to_i + cook_time.to_i
+
+  def copy_for(user)
+    dup.tap do |copy|
+      copy.assign_attributes(user:, public: false, original: self, modified: false)
+      copy.image.attach(image.blob) if image.attached?
+      ingredients.each { |ingredient| copy.ingredients.build(ingredient.attributes.slice("name", "quantity", "unit", "section", "position")) }
+    end
+  end
+
+  private
+    def attach_remote_image
+      response = RemoteFetch.get(image_url)
+      image.attach(io: StringIO.new(response.body), filename: File.basename(URI.parse(image_url).path).presence || "image", content_type: response.content_type)
+    rescue RemoteFetch::Refused, URI::InvalidURIError, SocketError, Timeout::Error
+      nil
+    end
+
+    def image_is_a_photo
+      return unless image.attached?
+
+      errors.add(:image, "must be a JPEG, PNG, WebP or GIF") unless image.content_type.in?(ACCEPTED_IMAGE_TYPES)
+      errors.add(:image, "must be under #{MAX_IMAGE_SIZE / 1.megabyte} MB") if image.byte_size > MAX_IMAGE_SIZE
+    end
+
+    def flag_modified
+      self.modified = true if changed? || ingredients.any?(&:changed?)
+    end
+end

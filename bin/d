@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Run any command inside the Rails dev container: bin/d rails g model ...
+exec docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -v mise-bundle:/usr/local/bundle -v "$PWD":/app "${@:0:0}" mise-rails-dev "$@"
