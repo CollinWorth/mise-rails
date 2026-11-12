@@ -37,6 +37,10 @@ class Views::Recipes::Show < Views::Base
         Link(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :outline, data: { turbo_frame: "modal" }) { "Add to plan" }
         ButtonTo(action: recipe_grocery_items_path(@recipe), params: { scale: @scale }, size: :md) { "Add to grocery list" }
       end
+      if @recipe.public?
+        Button(type: :button, variant: :outline, size: :md, hidden: true,
+               data: { controller: "share", action: "share#share", share_title_value: @recipe.name, share_url_value: recipe_url(@recipe) }) { "Share" }
+      end
       if owner?
         Link(href: edit_recipe_path(@recipe), variant: :outline) { "Edit" }
         ButtonTo(action: recipe_path(@recipe), method: :delete, variant: :destructive, data: { turbo_confirm: "Delete #{@recipe.name}? This can't be undone." }) { "Delete" }
