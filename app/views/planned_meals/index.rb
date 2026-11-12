@@ -16,8 +16,14 @@ class Views::PlannedMeals::Index < Views::Base
 
   private
     def day(date)
-      Card do
-        CardHeader { CardTitle { date.strftime("%A, %b %-d") } }
+      today = date == Date.current
+      Card(class: today ? "ring-2 ring-primary" : "", data: { controller: ("scroll-into-view" if today) }) do
+        CardHeader do
+          Row(justify: :between) do
+            CardTitle { date.strftime("%A, %b %-d") }
+            Badge { "Today" } if today
+          end
+        end
         CardContent do
           Stack(gap: :sm) do
             @meals.fetch(date, []).each do |meal|
