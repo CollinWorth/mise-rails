@@ -25,6 +25,7 @@ class Components::RecipeForm < Components::Base
           input(type: :hidden, name: "recipe[image_url]", value: @recipe.image_url) if @recipe.image_url.present?
         end
         ingredients
+        field(:source_url, "Source link (optional)", type: :url, inputmode: "url", autocapitalize: "none", autocorrect: "off")
         TextAreaField(label: "Instructions (one step per line)", name: "recipe[instructions]", value: @recipe.instructions, rows: 10)
         Row(gap: :sm) do
           input(type: :hidden, name: "recipe[public]", value: "0")

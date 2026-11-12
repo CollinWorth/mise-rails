@@ -18,6 +18,7 @@ class Views::Recipes::Show < Views::Base
       Badge(variant: :outline) { @recipe.category } if @recipe.category.present?
       Badge(variant: :outline) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
     end
+    Link(href: @recipe.source_url, target: "_blank", rel: "noopener noreferrer") { "Source: #{@recipe.source_host}" } if @recipe.source_host
     Text { "Saved from #{@recipe.original.user.name}'s recipe" } if @recipe.original && @recipe.original.public?
     RecipeImage(recipe: @recipe, size: :full)
     ingredients

@@ -17,7 +17,7 @@ class RecipeImport
       else raise Failed, "Enter a web address or paste the recipe."
       end
 
-    parsed.slice(:name, :prep_time, :cook_time, :servings, :cuisine, :category, :instructions, :image_url)
+    parsed.slice(:name, :prep_time, :cook_time, :servings, :cuisine, :category, :instructions, :image_url, :source_url)
           .merge(ingredients_attributes: parsed[:ingredients].each_with_index.map { |line, position| ingredient_attributes(line).merge(position:) })
   rescue RemoteFetch::Refused => error
     raise Failed, error.message
@@ -29,6 +29,7 @@ class RecipeImport
       data = recipe_json(document) or raise Failed, "No recipe found on that page. Try pasting the text instead."
 
       {
+        source_url: @url.strip,
         name: data["name"], cuisine: Array(data["recipeCuisine"]).first, category: Array(data["recipeCategory"]).first,
         prep_time: minutes(data["prepTime"]), cook_time: minutes(data["cookTime"]),
         servings: Array(data["recipeYield"]).first.to_s[/\d+/]&.to_i,

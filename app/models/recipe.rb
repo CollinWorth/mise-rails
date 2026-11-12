@@ -29,6 +29,7 @@ class Recipe < ApplicationRecord
   MAX_IMAGE_SIZE = 10.megabytes
 
   validates :name, presence: true
+  validate :source_url_is_a_web_address
   validate :image_is_a_photo
 
   before_validation :attach_remote_image, on: :create, if: -> { image_url.present? && !image.attached? }
@@ -53,6 +54,8 @@ class Recipe < ApplicationRecord
   def liked_by?(user) = likes.exists?(user:)
   def rating_by(user) = rated_recipe.ratings.find_by(user:)&.value
 
+  def source_host = web_uri(source_url)&.host
+
   def steps = instructions.to_s.split(/\n+/).map(&:strip).compact_blank
   def total_time = prep_time.to_i + cook_time.to_i
 
@@ -69,6 +72,18 @@ class Recipe < ApplicationRecord
       response = RemoteFetch.get(image_url)
       image.attach(io: StringIO.new(response.body), filename: File.basename(URI.parse(image_url).path).presence || "image", content_type: response.content_type)
     rescue RemoteFetch::Refused, URI::InvalidURIError, SocketError, Timeout::Error
+      nil
+    end
+
+    # Only http(s) links are kept, since the address is shown as a clickable link.
+    def source_url_is_a_web_address
+      errors.add(:source_url, "must be a web address") if source_url.present? && web_uri(source_url).nil?
+    end
+
+    def web_uri(text)
+      uri = URI.parse(text.to_s.strip)
+      uri if uri.is_a?(URI::HTTP) && uri.host.present?
+    rescue URI::InvalidURIError
       nil
     end
 
