@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     resource :import, only: %i[new create]
   end
   resources :recipes do
+    resources :grocery_items, only: :create, module: :recipes
     resource :like, only: %i[create destroy]
     resource :rating, only: %i[update destroy]
     resource :copy, only: :create
