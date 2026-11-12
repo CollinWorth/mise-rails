@@ -1,6 +1,10 @@
 class Views::Recipes::Show < Views::Base
-  def initialize(recipe:)
+  SCALE_LABELS = { "0.5" => "½×", "1" => "1×", "2" => "2×", "3" => "3×" }.freeze
+
+  def initialize(recipe:, scale: "1")
     @recipe = recipe
+    @scale = scale
+    @factor = Recipe::SCALES.fetch(scale)
   end
 
   def view_template
@@ -9,7 +13,7 @@ class Views::Recipes::Show < Views::Base
       Link(href: user_path(@recipe.user)) { "by #{@recipe.user.name}" }
       Badge(variant: :outline) { "Prep #{@recipe.prep_time} min" } if @recipe.prep_time
       Badge(variant: :outline) { "Cook #{@recipe.cook_time} min" } if @recipe.cook_time
-      Badge(variant: :outline) { "Serves #{@recipe.servings}" } if @recipe.servings
+      Badge(variant: :outline) { "Serves #{Quantity.format(@recipe.servings * @factor)}" } if @recipe.servings
       Badge(variant: :outline) { @recipe.cuisine } if @recipe.cuisine.present?
       Badge(variant: :outline) { @recipe.category } if @recipe.category.present?
       Badge(variant: :outline) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
@@ -27,7 +31,7 @@ class Views::Recipes::Show < Views::Base
     def owner? = Current.user == @recipe.user
 
     def actions
-      Link(href: recipe_cook_path(@recipe), variant: :primary) { "Cook" }
+      Link(href: recipe_cook_path(@recipe, scale: @scale), variant: :primary) { "Cook" }
       Link(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :outline, data: { turbo_frame: "modal" }) { "Add to plan" } if Current.user
       if owner?
         Link(href: edit_recipe_path(@recipe), variant: :outline) { "Edit" }
@@ -39,17 +43,30 @@ class Views::Recipes::Show < Views::Base
 
     def ingredients
       Card do
-        CardHeader { CardTitle { "Ingredients" } }
+        CardHeader do
+          Row(justify: :between) do
+            CardTitle { "Ingredients" }
+            scale_links
+          end
+        end
         CardContent do
           Stack(gap: :sm) do
             @recipe.ingredients.each do |ingredient|
               if ingredient.section?
                 Heading(level: 4) { ingredient.name }
               else
-                Text { [ ingredient.quantity, ingredient.unit, ingredient.name ].compact_blank.join(" ") }
+                Text { ingredient.to_line(@factor) }
               end
             end
           end
+        end
+      end
+    end
+
+    def scale_links
+      Row(gap: :sm) do
+        SCALE_LABELS.each do |key, label|
+          Link(href: recipe_path(@recipe, scale: (key unless key == "1")), variant: key == @scale ? :secondary : :ghost, size: :sm) { label }
         end
       end
     end

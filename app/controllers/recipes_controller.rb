@@ -11,7 +11,7 @@ class RecipesController < ApplicationController
   end
 
   def show
-    render Views::Recipes::Show.new(recipe: @recipe)
+    render Views::Recipes::Show.new(recipe: @recipe, scale: Recipe.scale_key(params[:scale]))
   end
 
   def new
