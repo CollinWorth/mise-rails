@@ -35,7 +35,7 @@ class Views::Cooks::Show < Views::Base
     def steps
       Stack do
         @recipe.steps.each_with_index do |step, index|
-          Card do
+          Card(data: { controller: "done", action: "click->done#toggle" }, role: "button", class: "cursor-pointer transition-opacity") do
             CardHeader { CardTitle { "Step #{index + 1}" } }
             CardContent { Text { step } }
           end
