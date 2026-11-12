@@ -15,6 +15,14 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_current_path root_path
   end
 
+  # Sheets slide in; a click while one is still moving can land on the wrong row, so wait for it to settle.
+  def assert_sheet_open
+    assert_selector "[data-controller~=sheet]"
+    page.document.synchronize do
+      raise Capybara::ExpectationNotMet, "sheet is still animating" if page.evaluate_script("document.getAnimations().length").positive?
+    end
+  end
+
   # Lazy images below the fold never load in a short window, so load them all, then wait for every image to decode.
   def assert_images_loaded(count:)
     assert_selector "img", count:

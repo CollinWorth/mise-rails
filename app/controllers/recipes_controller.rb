@@ -54,7 +54,7 @@ class RecipesController < ApplicationController
     end
 
     def recipe_params
-      params.expect(recipe: [ :name, :instructions, :prep_time, :cook_time, :servings, :cuisine, :category, :tags, :public, :image,
+      params.expect(recipe: [ :name, :instructions, :prep_time, :cook_time, :servings, :cuisine, :category, :tags, :public, :image, :remove_image,
                               ingredients_attributes: [ %i[id name quantity unit section position _destroy] ] ])
     end
 end

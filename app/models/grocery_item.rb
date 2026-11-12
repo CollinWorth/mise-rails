@@ -7,7 +7,7 @@ class GroceryItem < ApplicationRecord
   validates :name, presence: true
   validates :category, inclusion: { in: CATEGORIES.keys }
 
-  before_validation :guess_category, on: :create
+  before_validation :guess_category, if: :guess_category?
 
   def amount = Quantity.parse(quantity)
 
@@ -19,7 +19,12 @@ class GroceryItem < ApplicationRecord
   end
 
   private
+    # New items, and renamed ones, go to the aisle their name suggests.
+    def guess_category?
+      category.blank? || category == "other" || (persisted? && name_changed? && !category_changed?)
+    end
+
     def guess_category
-      self.category = self.class.categorize(name) if category.blank? || category == "other"
+      self.category = self.class.categorize(name)
     end
 end

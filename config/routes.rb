@@ -27,11 +27,11 @@ Rails.application.routes.draw do
     resources :comments, only: %i[create destroy]
   end
 
-  resources :planned_meals, only: %i[index create destroy]
+  resources :planned_meals, only: %i[index new create destroy]
 
   resource :grocery_list, only: :show do
     scope module: :grocery_lists do
-      resources :items, only: %i[create update destroy]
+      resources :items, only: %i[create edit update destroy]
       resource :checked_items, only: :destroy
       resource :meal_plan, only: :create
     end

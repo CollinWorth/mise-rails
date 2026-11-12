@@ -20,6 +20,7 @@ class Components::RecipeForm < Components::Base
         end
         FormField do
           FormFieldLabel(for: "recipe_image") { "Photo" }
+          current_photo
           Input(type: :file, id: "recipe_image", name: "recipe[image]", accept: "image/*")
           input(type: :hidden, name: "recipe[image_url]", value: @recipe.image_url) if @recipe.image_url.present?
         end
@@ -43,6 +44,17 @@ class Components::RecipeForm < Components::Base
       Field(label:, name: "recipe[#{attribute}]", type:, value: @recipe.public_send(attribute), errors: @recipe.errors[attribute], **attrs)
     end
 
+    def current_photo
+      return unless @recipe.persisted? && @recipe.image.attached? && @recipe.image.blob.persisted?
+
+      RecipeImage(recipe: @recipe)
+      Row(gap: :sm) do
+        input(type: :hidden, name: "recipe[remove_image]", value: "0")
+        Checkbox(id: "recipe_remove_image", name: "recipe[remove_image]", value: "1")
+        FormFieldLabel(for: "recipe_remove_image") { "Remove photo" }
+      end
+    end
+
     def ingredients
       rows = @recipe.ingredients.to_a
       rows << @recipe.ingredients.build if rows.empty?
@@ -51,7 +63,11 @@ class Components::RecipeForm < Components::Base
         Heading(level: 3) { "Ingredients" }
         div(data: { nested_form_target: "list" }) { rows.each_with_index { |ingredient, index| IngredientFields(ingredient:, index:) } }
         template(data: { nested_form_target: "template" }) { IngredientFields(ingredient: Ingredient.new, index: "NEW_RECORD") }
-        Button(type: :button, variant: :secondary, size: :sm, data: { action: "nested-form#add" }) { "Add ingredient" }
+        template(data: { nested_form_target: "sectionTemplate" }) { IngredientFields(ingredient: Ingredient.new(section: true), index: "NEW_RECORD") }
+        Row(gap: :sm) do
+          Button(type: :button, variant: :secondary, size: :sm, data: { action: "nested-form#add" }) { "Add ingredient" }
+          Button(type: :button, variant: :ghost, size: :sm, data: { action: "nested-form#addSection" }) { "Add section" }
+        end
       end
     end
 end

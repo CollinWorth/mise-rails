@@ -37,6 +37,7 @@ class Components::Layouts::Application < Components::Base
             yield
           end
         end
+        turbo_frame(id: "modal") # full-screen sheets (Components::Sheet) load in here
         TabBar(user: @user) if @user
       end
     end

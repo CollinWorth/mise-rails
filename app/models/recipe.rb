@@ -17,6 +17,9 @@ class Recipe < ApplicationRecord
   # Set when importing from a URL; the image is downloaded on save.
   attr_accessor :image_url
 
+  # Set by the edit form's "Remove photo" checkbox.
+  attr_accessor :remove_image
+
   ACCEPTED_IMAGE_TYPES = %w[image/jpeg image/png image/webp image/gif].freeze
   MAX_IMAGE_SIZE = 10.megabytes
 
@@ -26,6 +29,7 @@ class Recipe < ApplicationRecord
   before_validation :attach_remote_image, on: :create, if: -> { image_url.present? && !image.attached? }
 
   before_update :flag_modified, if: -> { original_id? }
+  after_save :purge_removed_image
 
   # Recipes other people can discover: public originals, not saved copies.
   scope :published, -> { where(public: true, original_id: nil) }
@@ -61,6 +65,10 @@ class Recipe < ApplicationRecord
       image.attach(io: StringIO.new(response.body), filename: File.basename(URI.parse(image_url).path).presence || "image", content_type: response.content_type)
     rescue RemoteFetch::Refused, URI::InvalidURIError, SocketError, Timeout::Error
       nil
+    end
+
+    def purge_removed_image
+      image.purge_later if ActiveModel::Type::Boolean.new.cast(remove_image) && !attachment_changes["image"]
     end
 
     def image_is_a_photo

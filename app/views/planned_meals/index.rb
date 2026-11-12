@@ -1,8 +1,7 @@
 class Views::PlannedMeals::Index < Views::Base
-  def initialize(week_start:, meals:, recipes:)
+  def initialize(week_start:, meals:)
     @week_start = week_start
     @meals = meals
-    @recipes = recipes
   end
 
   def view_template
@@ -27,19 +26,8 @@ class Views::PlannedMeals::Index < Views::Base
                 ButtonTo(action: planned_meal_path(meal), method: :delete, variant: :ghost) { "Remove" }
               end
             end
-            add_form(date) if @recipes.any?
+            Link(href: new_planned_meal_path(date:), variant: :outline, size: :sm, data: { turbo_frame: "modal" }) { "+ Add" }
           end
-        end
-      end
-    end
-
-    def add_form(date)
-      ActionForm(action: planned_meals_path) do
-        Stack(gap: :sm) do
-          input(type: :hidden, name: "planned_meal[date]", value: date)
-          SelectField(label: "Add a recipe", name: "planned_meal[recipe_id]", options: @recipes.map { |recipe| [ recipe.name, recipe.id ] }, id: "recipe_#{date}")
-          Field(label: "Times", name: "planned_meal[multiplier]", type: :number, value: 1, min: 1, id: "multiplier_#{date}")
-          Button(type: :submit, size: :sm) { "Add" }
         end
       end
     end

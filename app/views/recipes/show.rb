@@ -28,9 +28,10 @@ class Views::Recipes::Show < Views::Base
 
     def actions
       Link(href: recipe_cook_path(@recipe), variant: :primary) { "Cook" }
+      Link(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :outline, data: { turbo_frame: "modal" }) { "Add to plan" } if Current.user
       if owner?
         Link(href: edit_recipe_path(@recipe), variant: :outline) { "Edit" }
-        ButtonTo(action: recipe_path(@recipe), method: :delete, variant: :destructive) { "Delete" }
+        ButtonTo(action: recipe_path(@recipe), method: :delete, variant: :destructive, data: { turbo_confirm: "Delete #{@recipe.name}? This can't be undone." }) { "Delete" }
       elsif Current.user
         ButtonTo(action: recipe_copy_path(@recipe)) { "Save to my recipes" }
       end

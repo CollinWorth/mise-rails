@@ -6,13 +6,14 @@ class Components::Field < Components::Base
     @type = type
     @value = value
     @errors = errors
+    @id = input_attrs.delete(:id) || name
     @input_attrs = input_attrs
   end
 
   def view_template
     FormField do
-      FormFieldLabel(for: @name) { @label }
-      Input(type: @type, id: @name, name: @name, value: @value, **@input_attrs)
+      FormFieldLabel(for: @id) { @label }
+      Input(type: @type, id: @id, name: @name, value: @value, **@input_attrs)
       FormFieldError { @errors.to_sentence } if @errors.any?
     end
   end
