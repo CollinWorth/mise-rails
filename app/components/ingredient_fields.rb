@@ -14,13 +14,19 @@ class Components::IngredientFields < Components::Base
       input(type: :hidden, name: "#{prefix}[position]", value: @index)
       if @ingredient.section?
         input(type: :hidden, name: "#{prefix}[section]", value: "1")
-        Input(name: "#{prefix}[name]", value: @ingredient.name, placeholder: "Section, e.g. For the sauce", class: "min-w-0 flex-1 basis-40 font-semibold")
+        Input(name: "#{prefix}[name]", value: @ingredient.name, placeholder: "Section, e.g. For the sauce", class: "min-w-0 flex-1 basis-40 font-semibold", **enter_to_continue)
       else
-        Input(name: "#{prefix}[quantity]", value: @ingredient.quantity, placeholder: "Qty", class: "w-16 shrink-0")
-        Input(name: "#{prefix}[unit]", value: @ingredient.unit, placeholder: "Unit", class: "w-20 shrink-0")
-        Input(name: "#{prefix}[name]", value: @ingredient.name, placeholder: "Ingredient", class: "min-w-0 flex-1 basis-40")
+        Input(name: "#{prefix}[quantity]", value: @ingredient.quantity, placeholder: "Qty", class: "w-16 shrink-0", **enter_to_continue)
+        Input(name: "#{prefix}[unit]", value: @ingredient.unit, placeholder: "Unit", class: "w-20 shrink-0", **enter_to_continue)
+        Input(name: "#{prefix}[name]", value: @ingredient.name, placeholder: "Ingredient", class: "min-w-0 flex-1 basis-40", **enter_to_continue)
       end
       Button(type: :button, variant: :ghost, size: :sm, data: { action: "nested-form#remove" }) { "Remove" }
     end
   end
+
+  private
+    # Return moves to the next row (adding one at the end) instead of submitting the whole form.
+    def enter_to_continue
+      { enterkeyhint: "next", data: { action: "keydown.enter->nested-form#enter" } }
+    end
 end
