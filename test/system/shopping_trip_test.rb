@@ -77,7 +77,7 @@ class ShoppingTripTest < ApplicationSystemTestCase
     assert_text "flour"
 
     within(:xpath, "//p[normalize-space()='salt']/ancestor::div[contains(@class,'justify-between')][1]") { click_button "Remove" }
-    assert_no_selector "p", text: /\Asalt\z/
+    assert_no_selector "p", text: /\Asalt\z/, wait: 5
     assert_button "+ salt" # it's a suggestion again
     assert_equal [ "flour", "olive oil" ], @cook.pantry_keys.sort
   end

@@ -8,7 +8,7 @@ class Components::RecipeCard < Components::Base
     Card do
       CardHeader do
         RecipeImage(recipe: @recipe)
-        CardTitle { Link(href: recipe_path(@recipe)) { @recipe.name } }
+        CardTitle { TextLink(href: recipe_path(@recipe)) { @recipe.name } }
         CardDescription { byline } if byline.present?
       end
       CardContent do

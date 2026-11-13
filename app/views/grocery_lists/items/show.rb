@@ -35,6 +35,6 @@ class Views::GroceryLists::Items::Show < Views::Base
     end
 
     def recipe_name(source)
-      source.recipe ? Link(href: recipe_path(source.recipe), data: { turbo_frame: "_top" }) { source.recipe_name } : Text { "#{source.recipe_name} (deleted)" }
+      source.recipe ? TextLink(href: recipe_path(source.recipe), data: { turbo_frame: "_top" }) { source.recipe_name } : Text { "#{source.recipe_name} (deleted)" }
     end
 end

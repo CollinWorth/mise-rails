@@ -9,7 +9,7 @@ class Components::UserGrid < Components::Base
 
     Grid(columns: 3) do
       @users.each do |user|
-        Card { CardHeader { CardTitle { Link(href: user_path(user)) { user.name } } } }
+        Card { CardHeader { CardTitle { TextLink(href: user_path(user)) { user.name } } } }
       end
     end
   end

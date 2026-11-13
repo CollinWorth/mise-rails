@@ -18,6 +18,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_current_path root_path
   end
 
+  def on_desktop
+    page.driver.browser.manage.window.resize_to(1280, 800)
+    yield
+  ensure
+    page.driver.browser.manage.window.resize_to(390, 844)
+  end
+
   # Sheets slide in; a click while one is still moving can land on the wrong row, so wait for it to settle.
   def assert_sheet_open
     assert_selector "[data-controller~=sheet]"

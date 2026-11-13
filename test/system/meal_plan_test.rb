@@ -56,6 +56,37 @@ class MealPlanTest < ApplicationSystemTestCase
     assert_equal [ @salad.id, Date.current + 1 ], @cook.planned_meals.pluck(:recipe_id, :date).last
   end
 
+  test "on a desktop the sheet is a centered dialog that the backdrop closes" do
+    on_desktop do
+      visit planned_meals_path
+      first(:link, "+ Add").click
+      assert_sheet_open
+
+      panel = find("[data-sheet-target=panel]")
+      assert_operator panel.native.size.width, :<, 700, "a dialog, not full-width"
+      assert_operator panel.native.rect.x, :>, 100, "centered, not against the left edge"
+
+      page.driver.browser.action.move_to_location(5, 5).click.perform
+      assert_no_selector "[data-controller~=sheet]"
+    end
+  end
+
+  test "on a phone the sheet covers the whole screen" do
+    visit planned_meals_path
+    first(:link, "+ Add").click
+    assert_sheet_open
+
+    assert_equal page.evaluate_script("window.innerWidth"), find("[data-sheet-target=panel]").native.size.width
+  end
+
+  test "the week fits on one row on a desktop" do
+    on_desktop do
+      visit planned_meals_path
+      heading = ->(day) { find(:xpath, "//*[normalize-space()='#{day}']").native.rect.y }
+      assert_equal heading.("Monday"), heading.("Sunday"), "Monday and Sunday share a row"
+    end
+  end
+
   test "today is highlighted in the planner" do
     visit planned_meals_path
     assert_selector "[data-controller~=scroll-into-view]", text: "Today"

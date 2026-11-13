@@ -4,7 +4,7 @@ class Components::RecipeForm < Components::Base
   end
 
   def view_template
-    ActionForm(action: @recipe.persisted? ? recipe_path(@recipe) : recipes_path, method: @recipe.persisted? ? :patch : :post, multipart: true) do
+    ActionForm(action: @recipe.persisted? ? recipe_path(@recipe) : recipes_path, method: @recipe.persisted? ? :patch : :post, multipart: true, class: "max-w-2xl") do
       Stack do
         ErrorMessages(record: @recipe)
         field(:name, "Name", required: true)

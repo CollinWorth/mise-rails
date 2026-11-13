@@ -7,7 +7,7 @@ class Views::Recipes::Show < Views::Base
   def view_template
     PageHeader(title: @recipe.name) { actions }
     Row(gap: :sm) do
-      Link(href: user_path(@recipe.user)) { "by #{@recipe.user.name}" }
+      TextLink(href: user_path(@recipe.user)) { "by #{@recipe.user.name}" }
       Badge(variant: :outline) { "Prep #{@recipe.prep_time} min" } if @recipe.prep_time
       Badge(variant: :outline) { "Cook #{@recipe.cook_time} min" } if @recipe.cook_time
       Badge(variant: :outline) { "Serves #{Quantity.format(@recipe.servings * @scale.factor)}" } if @recipe.servings
@@ -15,11 +15,13 @@ class Views::Recipes::Show < Views::Base
       Badge(variant: :outline) { @recipe.category } if @recipe.category.present?
       Badge(variant: :outline) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
     end
-    Link(href: @recipe.source_url, target: "_blank", rel: "noopener noreferrer") { "Source: #{@recipe.source_host}" } if @recipe.source_host
+    TextLink(href: @recipe.source_url, target: "_blank", rel: "noopener noreferrer") { "Source: #{@recipe.source_host}" } if @recipe.source_host
     Text { "Saved from #{@recipe.original.user.name}'s recipe" } if @recipe.original && @recipe.original.public?
     RecipeImage(recipe: @recipe, size: :full)
-    ingredients
-    steps
+    Grid(columns: 2) do
+      ingredients
+      steps
+    end
     reactions
     versions
     comments
