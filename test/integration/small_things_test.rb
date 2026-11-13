@@ -63,4 +63,22 @@ class SmallThingsTest < ActionDispatch::IntegrationTest
     get new_registration_path
     assert_select "input[name='user[password]'][autocomplete=new-password]"
   end
+
+  test "rating, commenting and following send you back to the exact page you were on" do
+    scaled = recipe_url(@recipe, scale: "2")
+
+    put recipe_rating_path(@recipe), params: { value: 2 }, headers: { "HTTP_REFERER" => scaled }
+    assert_redirected_to scaled
+
+    delete recipe_rating_path(@recipe), headers: { "HTTP_REFERER" => scaled }
+    assert_redirected_to scaled
+
+    post recipe_comments_path(@recipe), params: { comment: { body: "Nice" } }, headers: { "HTTP_REFERER" => scaled }
+    assert_redirected_to scaled
+
+    other = create_user(name: "Other")
+    paged = user_url(other, page: 2)
+    post user_follow_path(other), headers: { "HTTP_REFERER" => paged }
+    assert_redirected_to paged
+  end
 end

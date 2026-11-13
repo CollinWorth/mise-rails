@@ -71,7 +71,7 @@ class Views::Recipes::Show < Views::Base
     def scale_links
       Row(gap: :sm) do
         Scale::ALL.each do |scale|
-          Link(href: recipe_path(@recipe, scale: scale.to_param), variant: scale == @scale ? :secondary : :ghost, size: :sm) { scale.label }
+          Link(href: recipe_path(@recipe, scale: scale.to_param), variant: scale == @scale ? :secondary : :ghost, size: :sm, data: { turbo_action: "replace" }) { scale.label }
         end
       end
     end

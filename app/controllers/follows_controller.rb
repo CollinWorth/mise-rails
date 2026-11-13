@@ -3,12 +3,12 @@ class FollowsController < ApplicationController
 
   def create
     Current.user.follows.find_or_create_by(followed: @user)
-    redirect_to @user, status: :see_other
+    redirect_back_or_to @user, status: :see_other
   end
 
   def destroy
     Current.user.follows.where(followed: @user).destroy_all
-    redirect_to @user, status: :see_other
+    redirect_back_or_to @user, status: :see_other
   end
 
   private

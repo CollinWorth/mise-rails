@@ -46,4 +46,27 @@ class ReactionsTest < ApplicationSystemTestCase
     assert_button "♥ 1"
     assert_in_delta before, page.evaluate_script("Math.round(scrollY)"), 100
   end
+
+  test "rating a scaled recipe keeps the scale and the scroll position" do
+    tall = create_recipe(@recipe.user, name: "Long Recipe", ingredients: Array.new(40) { |n| { name: "ingredient #{n}", quantity: "2" } })
+    visit recipe_path(tall, scale: "2")
+    page.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+    before = page.evaluate_script("Math.round(scrollY)")
+    assert_operator before, :>, 300
+
+    all("button", text: "★")[1].click
+    assert_selector "button", text: "Clear"
+    assert_equal "2", URI.parse(current_url).query.to_s[/scale=(\d)/, 1]
+    assert_in_delta before, page.evaluate_script("Math.round(scrollY)"), 100
+  end
+
+  test "changing the scale from partway down the page doesn't jump to the top" do
+    tall = create_recipe(@recipe.user, name: "Long Recipe", ingredients: Array.new(40) { |n| { name: "ingredient #{n}", quantity: "2" } })
+    visit recipe_path(tall)
+    page.execute_script("window.scrollTo(0, 260)")
+
+    click_link "3×"
+    assert_text "6 ingredient 0"
+    assert_in_delta 260, page.evaluate_script("Math.round(scrollY)"), 60
+  end
 end
