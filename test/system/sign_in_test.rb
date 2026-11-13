@@ -9,7 +9,7 @@ class SignInSystemTest < ApplicationSystemTestCase
 
     visit profile_path
     click_button "Sign out"
-    assert_current_path new_session_path
+    assert_current_path root_path
   end
 
   test "wrong password shows an error and stays on the form" do

@@ -15,7 +15,7 @@ class JourneyTestCase < ApplicationSystemTestCase
   def sign_out
     click_button "Account menu"
     click_button "Sign out"
-    assert_current_path new_session_path
+    assert_current_path root_path
   end
 
   def sign_in(email)

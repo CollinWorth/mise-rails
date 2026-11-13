@@ -6,7 +6,8 @@ class NewCookJourneySystemTest < JourneyTestCase
   test "from the front door to a cooked dinner and back again" do
     # --- the front door
     visit root_path
-    assert_text(/Dinner,\s+decided\./)
+    assert_link "Get started"
+    assert_text "dinner,"
 
     # --- sign up lands on an empty recipe list
     sign_up(name: "Nora", email: "nora@example.com")
@@ -90,8 +91,7 @@ class NewCookJourneySystemTest < JourneyTestCase
 
     # --- leave and come back: everything is still there
     sign_out
-    visit root_path
-    assert_text(/Dinner,\s+decided\./)
+    assert_link "Get started" # signing out lands on the front door
     sign_in("nora@example.com")
     click_link "Tomato Pasta", exact: true, match: :first
     assert_selector "h1", text: "Tomato Pasta"

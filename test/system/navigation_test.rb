@@ -16,7 +16,7 @@ class NavigationSystemTest < ApplicationSystemTestCase
     assert_link "Pantry"
 
     click_button "Sign out"
-    assert_current_path new_session_path
+    assert_current_path root_path
   end
 
   test "the account menu closes on Escape and on a click elsewhere" do

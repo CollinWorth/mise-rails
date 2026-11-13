@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   root "landing#show"
+  get "classic", to: "landing#classic" # the previous, longer landing page
 
   resource :session, only: %i[new create destroy]
   resource :registration, only: %i[new create]
