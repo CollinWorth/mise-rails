@@ -20,6 +20,20 @@ class LandingSystemTest < ApplicationSystemTestCase
     builder.release.perform
   end
 
+  test "it is a tall fridge: two doors, a seal between them, handles and a nameplate, on a phone and a desktop" do
+    visit root_path
+    door = find("[data-controller=magnets]").native.rect
+    assert_operator door.height, :>, door.width * 1.4, "tall, like a fridge"
+    assert_selector "span", text: "mise", visible: :all
+
+    on_desktop do
+      visit root_path
+      wide = find("[data-controller=magnets]").native.rect
+      assert_operator wide.height, :>, wide.width * 1.4, "still tall on a desktop"
+      assert_operator wide.width, :<, 500, "not stretched across the screen"
+    end
+  end
+
   test "it fits a phone and a desktop without sideways scrolling" do
     visit root_path
     assert_selector "[data-magnets-target=magnet]", minimum: 10
@@ -153,7 +167,7 @@ class LandingSystemTest < ApplicationSystemTestCase
     assert_current_path new_registration_path
 
     visit root_path
-    click_link "Sign in", match: :first
+    click_link "Already have an account? Sign in"
     assert_current_path new_session_path
 
     visit root_path

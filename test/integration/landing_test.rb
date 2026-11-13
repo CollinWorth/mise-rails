@@ -12,9 +12,23 @@ class LandingTest < ActionDispatch::IntegrationTest
     assert_select "[data-magnets-target=magnet]", text: "dinner,"
     assert_select "[data-magnets-target=magnet]", text: "decided."
     assert_select "a[href='#{new_registration_path}']", text: "Get started"
-    assert_select "a[href='#{new_session_path}']", text: "Sign in", minimum: 1
-    assert_select "a[href='#{discover_path}']", minimum: 1
+    assert_select "a[href='#{new_session_path}']", text: /Sign in/
+    assert_select "a[href='#{discover_path}']", text: "Browse recipes"
     assert_select "nav.fixed", count: 0, message: "no tab bar for visitors"
+  end
+
+  test "there is one way to sign up and one to sign in, not a row of them" do
+    get root_path
+
+    assert_select "a[href='#{new_registration_path}']", count: 1
+    assert_select "a[href='#{new_session_path}']", count: 1
+    assert_select "header a", text: "Sign up", count: 0
+    assert_select "header a", text: "Sign in", count: 0
+    assert_select "header a", text: "Mise", count: 1, message: "the top bar is just the brand"
+    assert_select "footer", count: 0
+
+    get new_session_path
+    assert_select "header a", text: "Sign up", message: "other pages keep the full top bar"
   end
 
   test "the notes work without any recipes: a grocery list and a few sample dinners" do

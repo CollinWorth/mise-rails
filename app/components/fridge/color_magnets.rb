@@ -2,9 +2,9 @@
 # (landing_palette_controller.js; nothing is saved).
 class Components::Fridge::ColorMagnets < Components::Base
   def view_template
-    div(data: { controller: "landing-palette" }, class: "flex flex-col items-center gap-3") do
+    div(data: { controller: "landing-palette" }, class: "flex flex-col items-center gap-3 md:items-start") do
       Text(as: "span", size: "2", class: "text-muted-foreground") { "Pick the fridge's color" }
-      div(class: "grid grid-cols-4 gap-4 sm:flex sm:flex-wrap sm:justify-center sm:gap-3") do
+      div(class: "grid grid-cols-4 gap-4 sm:flex sm:flex-wrap sm:gap-3") do
         Palette::LIGHT.each { |key, name| magnet(key, name, mode: "light") }
         Palette::DARK.each { |key, name| magnet(key, name, mode: "dark") }
       end

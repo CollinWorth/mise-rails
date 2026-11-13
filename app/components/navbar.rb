@@ -2,8 +2,10 @@
 class Components::Navbar < Components::Base
   include Components::NavLinks
 
-  def initialize(user:)
+  # `quiet` is for the front door, where the page itself holds the way in: guests see just the brand.
+  def initialize(user:, quiet: false)
     @user = user
+    @quiet = quiet
   end
 
   def view_template
@@ -12,7 +14,7 @@ class Components::Navbar < Components::Base
         brand
         links if @user
         div(class: "ml-auto flex items-center gap-1") do
-          @user ? account_menu : sign_in_links
+          @user ? account_menu : (sign_in_links unless @quiet)
         end
       end
     end

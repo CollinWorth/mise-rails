@@ -1,20 +1,18 @@
-# The landing page's fridge door: a themed surface covered in things to play with. The headline is magnet words that drag
-# (magnets_controller.js), next to a grocery note that ticks off, a note that picks tonight's dinner, and a photo of a real
-# recipe. Positions are percentages of the door, with a second set for wide screens, and sizes follow the door's width, so it
-# scales as one piece. Every color comes from the active theme.
+# The landing page's fridge: a tall two-door fridge (freezer on top) with handles, a seal between the doors, a nameplate and
+# feet, covered in things to play with. The headline is magnet words that drag (magnets_controller.js), next to a grocery note
+# that ticks off, a note that picks tonight's dinner, and a photo of a real recipe. Everything is placed in units of the door's
+# width (cqw) so it scales as one piece, and every color comes from the active theme.
 class Components::Fridge::Door < Components::Base
   include Components::Fridge
-  # [text, x, y, wide x, wide y, tilt, style]; x and y are % of the door's width and height.
-  HEADLINE = [
-    [ "dinner,", 6, 4, 4, 8, -3, :big ],
-    [ "decided.", 9, 17, 8, 28, 2, :hero ]
-  ].freeze
-  WORDS = [
-    [ "tonight", 5, 36.5, 4, 60, -2, :plain ], [ "cozy", 31, 35.5, 17, 60.5, 3, :primary ], [ "crispy", 50, 37, 28, 59.5, -1, :plain ], [ "again", 73, 35.5, 42, 60.5, 2, :plain ],
-    [ "pasta", 8, 43.5, 7, 68.5, 2, :secondary ], [ "for two", 30, 44.5, 19, 69, -2, :plain ], [ "plan", 55, 43.5, 34, 68, 1, :plain ], [ "shop", 73, 44.5, 45, 69, -3, :tertiary ],
-    [ "cook", 5, 52, 4, 77, -2, :plain ], [ "hungry?", 25, 52.5, 15, 77.5, 2, :plain ], [ "slow", 53, 52, 30, 77, -1, :secondary ]
-  ].freeze
 
+  # The door is 7 wide by 11.6 tall: 100cqw wide, about 166cqw tall. The seal between the doors is at 61cqw.
+  # [text, x as % of the width, y in cqw, tilt, style]
+  WORDS = [
+    [ "dinner,", 6, 5, -3, :big ], [ "decided.", 9, 22, 2, :hero ],
+    [ "tonight", 5, 50, -2, :plain ], [ "cozy", 31, 49, 3, :primary ], [ "crispy", 50, 50.5, -1, :plain ], [ "again", 73, 49, 2, :plain ],
+    [ "pasta", 8, 68, 2, :secondary ], [ "for two", 30, 69, -2, :plain ], [ "plan", 55, 68, 1, :plain ], [ "shop", 72, 69, -3, :tertiary ],
+    [ "cook", 5, 79, -2, :plain ], [ "hungry?", 25, 79.5, 2, :plain ], [ "slow", 53, 79, -1, :secondary ]
+  ].freeze
   SAMPLE_DINNERS = [ "Lemony chicken thighs", "Tomato basil pasta", "Sheet-pan fajitas", "Mushroom risotto", "Crispy tofu bowls", "Shakshuka" ].freeze
 
   def initialize(recipes:, dinners:)
@@ -23,35 +21,50 @@ class Components::Fridge::Door < Components::Base
   end
 
   def view_template
-    div(class: "mx-auto w-full max-w-5xl") do
-      div(data: { controller: "magnets" },
-          class: "@container relative aspect-[7/10.4] w-full touch-pan-y select-none overflow-hidden rounded-[2rem] border bg-gradient-to-b from-card via-card to-muted shadow-xl md:aspect-[16/9]") do
+    div(class: "relative mx-auto w-full max-w-sm pb-3 md:max-w-md") do
+      div(data: { controller: "magnets" }, class: "@container relative aspect-[7/11.6] w-full touch-pan-y select-none overflow-hidden rounded-[1.6rem] border-2 #{BODY}") do
         trim
-        (HEADLINE + WORDS).each_with_index { |word, index| Word(*word, delay: index) }
+        WORDS.each_with_index { |word, index| Word(*word, delay: index) }
         hint
         photo
         GroceryNote()
         DinnerNote(names: @dinners.size >= 3 ? @dinners : SAMPLE_DINNERS)
       end
+      feet
     end
   end
 
   private
-    # The door's own details: a seam between freezer and fridge, a handle, and the light catching it.
+    # What makes it a fridge: brushed enamel, a dark seal between freezer and fridge door, chrome handles at the edge of each
+    # door, a nameplate, and a light streak down the front.
     def trim
       div(class: "pointer-events-none absolute inset-0", aria_hidden: "true") do
-        div(class: "absolute inset-0 bg-gradient-to-r from-foreground/[0.04] via-transparent to-foreground/[0.07]")
-        div(class: "absolute inset-x-0 top-[33%] h-px bg-foreground/15 shadow-[0_1px_0_var(--background)] md:top-[52%]")
-        div(class: "absolute right-[3cqw] top-[6%] h-[20%] w-[1.8cqw] rounded-full bg-gradient-to-r from-muted to-background shadow-md md:h-[30%] md:w-[0.9cqw]")
-        div(class: "absolute right-[3cqw] top-[39%] h-[24%] w-[1.8cqw] rounded-full bg-gradient-to-r from-muted to-background shadow-md md:top-[58%] md:h-[30%] md:w-[0.9cqw]")
+        div(class: "absolute inset-0 #{BRUSHED}")
+        div(class: "absolute inset-y-0 left-[8%] w-[22%] -skew-x-6 bg-gradient-to-r from-transparent via-background/40 to-transparent")
+        div(class: "absolute inset-x-0 top-[61cqw] h-[2.4cqw] -translate-y-1/2 bg-foreground/35 shadow-[0_1px_0_var(--background),0_-1px_0_var(--background)]")
+        handle("top-[10cqw] h-[40cqw]")
+        handle("top-[70cqw] h-[52cqw]")
+        div(class: "absolute inset-x-0 bottom-[2.4cqw] flex justify-center") { nameplate }
+        div(class: "absolute inset-y-0 right-0 w-[3cqw] bg-gradient-to-l from-foreground/20 to-transparent")
+      end
+    end
+
+    def handle(position)
+      div(class: "absolute right-[3.4cqw] w-[2.8cqw] rounded-full #{CHROME} #{position}")
+    end
+
+    def nameplate
+      span(class: "inline-flex items-center gap-[1cqw] rounded-full px-[3cqw] py-[0.8cqw] text-[3cqw] font-bold uppercase tracking-[0.3em] text-foreground/70 #{CHROME}") do
+        Icon(:chef_hat, class: "size-[3.6cqw]")
+        plain "mise"
       end
     end
 
     # A scrawled arrow pointing at the headline; it goes away the first time a word moves.
     def hint
       div(data: { magnets_target: "hint" }, aria_hidden: "true",
-          class: "pointer-events-none absolute left-(--x) top-(--y) z-10 -rotate-6 #{HAND} text-[4.4cqw] text-primary transition-opacity duration-500 md:left-(--mx) md:top-(--my) md:text-[1.8cqw]",
-          style: "--x: 18%; --y: 28%; --mx: 12%; --my: 46%") do
+          class: "pointer-events-none absolute left-(--x) top-(--y) z-10 -rotate-6 #{HAND} text-[4.4cqw] text-primary transition-opacity duration-500",
+          style: "--x: 18%; --y: 40cqw") do
         plain "↑ the words move!"
       end
     end
@@ -59,5 +72,14 @@ class Components::Fridge::Door < Components::Base
     def photo
       recipe = @recipes.find { |candidate| candidate.image.attached? }
       Polaroid(recipe:) if recipe
+    end
+
+    # Two little feet and the shadow on the floor.
+    def feet
+      div(class: "pointer-events-none absolute inset-x-0 bottom-0", aria_hidden: "true") do
+        div(class: "absolute inset-x-6 -bottom-1 h-3 rounded-full bg-foreground/25 blur-md")
+        div(class: "absolute bottom-0 left-[9%] h-3 w-[14%] rounded-b-lg bg-foreground/70")
+        div(class: "absolute bottom-0 right-[9%] h-3 w-[14%] rounded-b-lg bg-foreground/70")
+      end
     end
 end

@@ -25,9 +25,10 @@ class Components::Layouts::Application < Components::Base
     })();
   JS
 
-  def initialize(user: Current.user, bleed: false)
+  def initialize(user: Current.user, bleed: false, quiet_nav: false)
     @user = user
     @bleed = bleed
+    @quiet_nav = quiet_nav
   end
 
   def view_template(&)
@@ -55,7 +56,7 @@ class Components::Layouts::Application < Components::Base
         javascript_importmap_tags
       end
       body(class: "pb-[calc(env(safe-area-inset-bottom)+5rem)] md:pb-0") do
-        Navbar(user: @user)
+        Navbar(user: @user, quiet: @quiet_nav)
         FlashMessages(flash: flash)
         if @bleed
           yield
