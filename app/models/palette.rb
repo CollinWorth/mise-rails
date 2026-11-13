@@ -11,6 +11,18 @@ class Palette
   DEFAULT_DARK = "ember"
   DEFAULT_APPEARANCE = "auto"
 
+  STYLESHEET = Rails.root.join("app/assets/tailwind/application.css")
+
   def self.all = LIGHT.merge(DARK)
   def self.dark?(key) = DARK.key?(key)
+
+  # The page color of a theme, read from the stylesheet so it is only ever written once. The phone's top bar and the
+  # installed app's splash screen only accept a literal color, so they take it from here.
+  def self.background(key)
+    backgrounds[key] || backgrounds[DEFAULT_LIGHT]
+  end
+
+  def self.backgrounds
+    @backgrounds ||= STYLESHEET.read.scan(/^\[data-palette="(\w+)"\] \{[^}]*--p-bg: (#\h{6})/).to_h
+  end
 end

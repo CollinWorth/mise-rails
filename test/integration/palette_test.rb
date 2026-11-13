@@ -31,6 +31,28 @@ class PaletteIntegrationTest < ActionDispatch::IntegrationTest
     assert_select "html[data-appearance=auto][data-palette=#{Palette::DEFAULT_LIGHT}]"
   end
 
+  test "the phone's top bar takes the theme's page color, and both themes' colors are there for the early script" do
+    @cook.update!(appearance: "dark", dark_theme: "plum", light_theme: "meadow")
+    get recipes_path
+    assert_select "meta[name=theme-color][content=?][data-light=?][data-dark=?]", Palette.background("plum"), Palette.background("meadow"), Palette.background("plum")
+  end
+
+  test "the installed app's manifest uses the cook's theme color, and works signed out" do
+    @cook.update!(appearance: "light", light_theme: "lagoon")
+    get pwa_manifest_path(format: :json)
+    assert_equal Palette.background("lagoon"), JSON.parse(response.body)["theme_color"]
+    assert_equal Palette.background("lagoon"), JSON.parse(response.body)["background_color"]
+
+    delete session_path
+    get pwa_manifest_path(format: :json)
+    assert_equal Palette.background(Palette::DEFAULT_LIGHT), JSON.parse(response.body)["theme_color"]
+
+    @cook.update!(appearance: "dark", dark_theme: "plum")
+    sign_in @cook
+    get pwa_manifest_path(format: :json)
+    assert_equal Palette.background("plum"), JSON.parse(response.body)["theme_color"]
+  end
+
   test "there is no light/dark toggle button any more" do
     get recipes_path
     assert_select "button[aria-label='Toggle theme']", count: 0

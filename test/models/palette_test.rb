@@ -56,4 +56,9 @@ class PaletteTest < ActiveSupport::TestCase
       assert_operator contrast(colors["--p-primary"], colors["--p-bg"]), :>=, 3, "buttons and links against the page in #{key}"
     end
   end
+
+  test "the page color of every theme comes from the stylesheet" do
+    Palette.all.each_key { |key| assert_equal seeds(key)["--p-bg"], Palette.background(key), key }
+    assert_equal Palette.background(Palette::DEFAULT_LIGHT), Palette.background("nope")
+  end
 end

@@ -8,8 +8,6 @@ class ThemeColorsTest < ActiveSupport::TestCase
 
   # Places where a literal color is required or deliberate:
   ALLOWED = {
-    "app/views/pwa/manifest.json.erb" => "the app manifest only accepts literal colors",
-    "app/components/layouts/application.rb" => "the browser bar color (theme-color meta) is a literal",
     "app/components/ruby_ui/button/button.rb" => "white text on the red destructive button",
     "app/components/ruby_ui/link/link.rb" => "white text on the red destructive button link"
   }.freeze

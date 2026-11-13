@@ -17,6 +17,8 @@ class Components::Layouts::Application < Components::Base
         if (root.dataset.appearance !== "auto") return;
         root.classList.toggle("dark", query.matches);
         root.dataset.palette = query.matches ? root.dataset.darkTheme : root.dataset.lightTheme;
+        var bar = document.querySelector("meta[name=theme-color]");
+        if (bar) bar.content = query.matches ? bar.dataset.dark : bar.dataset.light;
       }
       apply();
       query.addEventListener("change", apply);
@@ -34,7 +36,7 @@ class Components::Layouts::Application < Components::Base
       head do
         title { "Mise" }
         meta(name: "viewport", content: "width=device-width,initial-scale=1,viewport-fit=cover")
-        meta(name: "theme-color", content: "#c2410c")
+        meta(name: "theme-color", content: Palette.background(palette), data: { light: Palette.background(light_theme), dark: Palette.background(dark_theme) })
         meta(name: "apple-mobile-web-app-capable", content: "yes")
         meta(name: "mobile-web-app-capable", content: "yes")
         meta(name: "apple-mobile-web-app-title", content: "Mise")
