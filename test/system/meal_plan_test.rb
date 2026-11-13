@@ -10,7 +10,7 @@ class MealPlanSystemTest < ApplicationSystemTestCase
 
   test "a day's Add button opens a full-screen sheet; picking a recipe adds it and the sheet closes" do
     visit planned_meals_path
-    first(:link, "+ Add").click
+    first(:link, "+ Add", visible: true).click
     assert_sheet_open
 
     fill_in "q", with: "greek"
@@ -25,7 +25,7 @@ class MealPlanSystemTest < ApplicationSystemTestCase
 
   test "closing the sheet adds nothing" do
     visit planned_meals_path
-    first(:link, "+ Add").click
+    first(:link, "+ Add", visible: true).click
     assert_sheet_open
     click_button "Close"
 
@@ -59,7 +59,7 @@ class MealPlanSystemTest < ApplicationSystemTestCase
   test "on a desktop the sheet is a centered dialog that the backdrop closes" do
     on_desktop do
       visit planned_meals_path
-      first(:link, "+ Add").click
+      first(:link, "+ Add", visible: true).click
       assert_sheet_open
 
       panel = find("[data-sheet-target=panel]")
@@ -73,23 +73,51 @@ class MealPlanSystemTest < ApplicationSystemTestCase
 
   test "on a phone the sheet covers the whole screen" do
     visit planned_meals_path
-    first(:link, "+ Add").click
+    first(:link, "+ Add", visible: true).click
     assert_sheet_open
 
     assert_equal page.evaluate_script("window.innerWidth"), find("[data-sheet-target=panel]").native.size.width
   end
 
-  test "the week fits on one row on a desktop" do
+  test "the week fits on one row on a desktop, without the phone's day strip" do
     on_desktop do
       visit planned_meals_path
-      heading = ->(day) { find(:xpath, "//*[normalize-space()='#{day}']").native.rect.y }
-      assert_equal heading.("Monday"), heading.("Sunday"), "Monday and Sunday share a row"
+      top = ->(date) { find("#day-#{date.iso8601}").native.rect.y }
+      monday = Date.current.beginning_of_week
+      assert_equal top.(monday), top.(monday + 6), "Monday and Sunday share a row"
+      assert_no_selector "nav[aria-label='Days of the week']"
     end
   end
 
   test "today is highlighted in the planner" do
     visit planned_meals_path
-    assert_selector "[data-controller~=scroll-into-view]", text: "Today"
+    assert_selector "#day-#{Date.current.iso8601}[data-controller~=scroll-into-view]"
+    assert_selector "nav[aria-label='Days of the week'] a", count: 7
+  end
+
+  test "the day strip on a phone jumps to a day" do
+    visit planned_meals_path
+    find("nav[aria-label='Days of the week'] a[aria-label='#{(Date.current.beginning_of_week + 6).strftime('%A, %B %-d')}']").click
+    assert_current_path(/#day-#{(Date.current.beginning_of_week + 6).iso8601}/, url: true)
+  end
+
+  test "a planned meal can be removed from its day" do
+    @cook.planned_meals.create!(recipe: @salad, date: Date.current)
+    visit planned_meals_path
+    assert_link "Greek Salad"
+    click_button "Remove Greek Salad from #{Date.current.strftime('%A')}"
+
+    assert_no_link "Greek Salad"
+    assert_equal 0, @cook.planned_meals.count
+  end
+
+  test "the week navigation moves between weeks and comes back to today" do
+    visit planned_meals_path
+    assert_no_link "Today"
+    click_link "Next week"
+    assert_text (Date.current.beginning_of_week + 7).strftime("%b %-d")
+    click_link "Today"
+    assert_current_path planned_meals_path(date: Date.current)
   end
 
   test "a recipe's ingredients go on the grocery list from its page" do

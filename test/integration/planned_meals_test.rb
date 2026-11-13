@@ -41,4 +41,28 @@ class PlannedMealsTest < ActionDispatch::IntegrationTest
     assert_match(/Added Soup to Saturday/, flash[:notice])
     assert_equal 2, @cook.planned_meals.last.multiplier
   end
+
+  test "the calendar shows the week's range, a day for each date and what is planned" do
+    monday = Date.new(2026, 11, 9)
+    @cook.planned_meals.create!(recipe: @soup, date: monday, multiplier: 2)
+    @cook.planned_meals.create!(recipe: @salad, date: monday + 2)
+
+    get planned_meals_path(date: monday + 3)
+    assert_select "h1", text: "Nov 9 – 15"
+    assert_select "[id^=day-]", count: 7
+    assert_select "#day-2026-11-09 a", text: "Soup"
+    assert_select "#day-2026-11-09", text: /×2/
+    assert_select "#day-2026-11-11 a", text: "Greek Salad"
+    assert_match(/2 meals planned · 5 days open/, response.body)
+    assert_select "a[href=?]", planned_meals_path(date: monday - 7), text: ""
+    assert_select "a[aria-label='Next week'][href=?]", planned_meals_path(date: monday + 7)
+    assert_select "button[aria-label=?]", "Remove Soup from Monday"
+  end
+
+  test "a week that crosses a month names both months, and an empty week says so" do
+    get planned_meals_path(date: "2026-11-30")
+    assert_select "h1", text: "Nov 30 – Dec 6"
+    assert_match(/Nothing planned yet/, response.body)
+    assert_select "a", text: "Add to grocery list", count: 0
+  end
 end
