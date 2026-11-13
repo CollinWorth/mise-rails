@@ -55,9 +55,18 @@ class LandingSystemTest < ApplicationSystemTestCase
   test "the whole page is there to scroll through" do
     visit root_path
     [ "Paste a link. Get a recipe.", "Drop it on a day.", "Shop once.", "Fresh from the community", "Make it yours.", "Ready when you are." ].each do |heading|
-      # Sections fade in once they're on screen, so bring each one into view (jumping to the bottom would skip the middle ones).
-      find(:xpath, "//*[normalize-space()='#{heading}']", match: :first, visible: :all).scroll_to(:center)
+      # Sections fade in once they're on screen, so scroll down the way a person does instead of jumping to the bottom.
+      scroll_down_the_page
       assert_text heading
     end
   end
+
+  private
+    def scroll_down_the_page
+      height = page.evaluate_script("document.body.scrollHeight")
+      0.step(height, 250) do |y|
+        page.execute_script("window.scrollTo(0, #{y})")
+        sleep 0.03
+      end
+    end
 end

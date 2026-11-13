@@ -115,4 +115,68 @@ class RecipesTest < ActionDispatch::IntegrationTest
     assert_select "h3", text: "Versions by other cooks"
     assert_select "a", text: "Better Soup"
   end
+
+  test "text the reader is sure about goes straight to the recipe form, with a way back to check how it was read" do
+    sign_in @user
+    post recipes_import_path, params: { text: "Tacos\nIngredients\n2 cups masa\n1 can beans\nMethod\nMix well." }
+
+    assert_response :unprocessable_content
+    assert_select "h1", text: "New recipe"
+    assert_select "input[name='recipe[name]'][value=Tacos]"
+    assert_select "form[action=?] input[name=check][value='1']", recipes_import_path
+    assert_select "input[name='lines[1][text]'][value='2 cups masa']"
+    assert_select "input[name='lines[1][role]'][value=ingredient]"
+    assert_select "button", text: "Check how I read it"
+  end
+
+  test "text the reader is unsure about goes to the sorting screen first, nothing is saved" do
+    sign_in @user
+    assert_no_difference -> { Recipe.count } do
+      post recipes_import_path, params: { text: "Toast\nbread\nbutter\nToast the bread." }
+    end
+
+    assert_response :unprocessable_content
+    assert_select "h1", text: "How I read it"
+    assert_match(/sure about some of this/, response.body)
+    assert_select "[data-line-sorter-target=row]", count: 4
+    assert_select "input[name='lines[0][role]'][value=title]"
+    assert_select "button", text: "Build recipe"
+  end
+
+  test "asking to check re-opens the sorting screen with the same roles, and building uses the cook's sorting" do
+    sign_in @user
+    lines = { "0" => { text: "Toast", role: "title" }, "1" => { text: "2 slices bread", role: "ingredient" }, "2" => { text: "1 tbsp butter", role: "ingredient" }, "3" => { text: "Toast it.", role: "step" } }
+
+    post recipes_import_path, params: { lines:, check: "1" }
+    assert_select "h1", text: "How I read it"
+    assert_no_match(/sure about some of this/, response.body)
+    assert_select "input[name='lines[3][role]'][value=step]"
+
+    lines["2"][:role] = "step" # the cook says the butter is a step
+    post recipes_import_path, params: { lines: }
+    assert_select "h1", text: "New recipe"
+    assert_select "input[value='2 slices bread']"
+    assert_select "textarea[aria-label=Step]", text: "1 tbsp butter"
+    assert_select "textarea[aria-label=Step]", text: "Toast it."
+  end
+
+  test "garbage in the lines is ignored rather than breaking the import" do
+    sign_in @user
+    post recipes_import_path, params: { lines: "not a hash" }
+    assert_redirected_to new_recipes_import_path
+
+    post recipes_import_path, params: { lines: { "0" => "x", "1" => { text: "Soup", role: "title" }, "2" => { text: "1 onion", role: "ingredient" }, "3" => { text: "Chop.", role: "step" } } }
+    assert_select "input[name='recipe[name]'][value=Soup]"
+  end
+
+  test "the import page explains iPhone scanning and desktop pasting" do
+    sign_in @user
+    get new_recipes_import_path
+    assert_select "h4", text: "On an iPhone or iPad"
+    assert_match(/Scan Text/, response.body)
+    assert_select "h4", text: "On a computer"
+    assert_select "button", text: "Paste from clipboard"
+    assert_select "textarea[name=text]"
+    assert_select "input[type=url][name=url]"
+  end
 end

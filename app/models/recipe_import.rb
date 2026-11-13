@@ -1,19 +1,33 @@
-# Builds recipe attributes from a URL or pasted text. Nothing is saved;
+# Builds recipe attributes from a URL, pasted text, or lines the cook has sorted (see TextReader). Nothing is saved;
 # the controller shows the result in the normal recipe form for review.
 class RecipeImport
   class Failed < StandardError; end
 
-  HEADERS = { ingredients: /\Aingredients?:?\z/i, instructions: /\A(instructions?|directions?|method|steps?|preparation):?\z/i }.freeze
-
+  # `lines` is an array of { text:, role: } the cook has already looked over; `text` is raw text to read.
   def initialize(params)
     @url = params[:url].to_s.strip
     @text = params[:text].to_s
+    @given_lines = params[:lines]
   end
+
+  def from_text? = @url.blank? && (@given_lines.present? || @text.present?)
+
+  # The text as lines with a role each: the cook's own sorting if they have done one, otherwise the reader's guess.
+  def lines
+    @lines ||= if @given_lines.present?
+      @given_lines.map { |line| TextReader::Line.new(text: line[:text].to_s.strip, role: TextReader::ROLES.include?(line[:role]) ? line[:role] : "skip") }.reject { |line| line.text.blank? }
+    else
+      reader.lines
+    end
+  end
+
+  # Whether the reader found enough to go straight to the recipe form; otherwise the cook is asked to sort the lines.
+  def confident? = @given_lines.present? || reader.confident?
 
   def attributes
     parsed =
       if @url.present? then from_url
-      elsif @text.present? then from_text(@text)
+      elsif from_text? then from_lines
       else raise Failed, "Enter a web address or paste the recipe."
       end
 
@@ -71,27 +85,21 @@ class RecipeImport
       node.is_a?(Hash) ? node["url"] : node
     end
 
-    def from_text(text)
-      lines = text.lines.map(&:strip).compact_blank
-      section = nil
-      parsed = { name: lines.first.to_s.truncate(120), ingredients: [], instructions: [] }
+    def reader = @reader ||= TextReader.new(@text)
 
-      lines.drop(1).each do |line|
-        if (header = HEADERS.find { |_, pattern| line.match?(pattern) })
-          section = header.first
-        elsif section
-          parsed[section] << line
-        elsif line.match?(/\A[\d½¼¾⅓⅔⅛]/)
-          parsed[:ingredients] << line
-        else
-          parsed[:instructions] << line
-        end
-      end
+    def from_lines
+      raise Failed, "There was no text to read." if lines.none?
 
-      parsed.merge(instructions: parsed[:instructions].join("\n"))
+      {
+        name: lines.find { |line| line.role == "title" }&.text.to_s.truncate(120),
+        ingredients: lines.filter_map { |line| line.role == "heading" ? { section: line.text } : (line.text if line.role == "ingredient") },
+        instructions: lines.select { |line| line.role == "step" }.map(&:text).join("\n")
+      }.merge(TextReader.facts(lines))
     end
 
     def ingredient_attributes(line)
+      return { name: line[:section], section: true, quantity: "", unit: "" } if line.is_a?(Hash)
+
       parsed = Ingreedy.parse(line)
       quantity = parsed.amount ? Quantity.format(parsed.amount.to_r.rationalize(Rational(1, 64))) : ""
       { name: parsed.ingredient.to_s.strip, quantity:, unit: parsed.unit.to_s }

@@ -9,8 +9,10 @@ class RecipeImportSystemTest < ApplicationSystemTestCase
 
   test "importing pasted text shows the recipe in the form for review, and saving it keeps it" do
     visit new_recipes_import_path
-    fill_in "…or paste the recipe text", with: "Tacos\nIngredients\n2 cups masa\nMethod\nMix well"
-    click_button "Import"
+    within("form[data-controller=paste]") do
+      fill_in "Recipe text", with: "Tacos\nIngredients\n2 cups masa\nMethod\nMix well"
+      click_button "Import"
+    end
 
     assert_selector "h1", text: "New recipe"
     assert_field "Name", with: "Tacos"
@@ -26,7 +28,7 @@ class RecipeImportSystemTest < ApplicationSystemTestCase
   test "an address that can't be imported goes back to the form with the reason" do
     visit new_recipes_import_path
     fill_in "Web address", with: "http://127.0.0.1/admin"
-    click_button "Import"
+    click_button "Import", match: :first
 
     assert_current_path new_recipes_import_path
     assert_selector "h1", text: "Import a recipe"

@@ -12,8 +12,10 @@ class DesktopJourneySystemTest < JourneyTestCase
 
       # --- import a recipe from pasted text, review it, save it
       click_link "Import"
-      fill_in "…or paste the recipe text", with: "Tacos\nIngredients\n2 cups masa\n1 can beans\nMethod\nMix the masa.\nServe with beans."
-      click_button "Import"
+      within("form[data-controller=paste]") do
+        fill_in "Recipe text", with: "Tacos\nIngredients\n2 cups masa\n1 can beans\nMethod\nMix the masa.\nServe with beans."
+        click_button "Import"
+      end
       assert_selector "h1", text: "New recipe"
       assert_field "Name", with: "Tacos"
       click_button "Save recipe"

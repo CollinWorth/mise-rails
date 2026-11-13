@@ -33,6 +33,7 @@ class GroceryListSystemTest < ApplicationSystemTestCase
 
     click_button "More list actions"
     click_link "Clear list…"
+    assert_sheet_open
     click_button "Clear 2 items"
     assert_text "Your list is empty"
     assert_text "Cleared 2 items"

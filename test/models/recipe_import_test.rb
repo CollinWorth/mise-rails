@@ -98,4 +98,30 @@ class RecipeImportTest < ActiveSupport::TestCase
     assert_equal [ "bread", "salt" ], attributes[:ingredients_attributes].map { |ingredient| ingredient[:name].split.last }
     assert_equal "Toast it.\nButter it.", attributes[:instructions]
   end
+
+  test "text is built into a recipe with its details and its section headings" do
+    attributes = RecipeImport.new(text: "Soup\nServes 4\nPrep time: 10 min\nIngredients\n1 onion\nFor the garnish:\n1/2 cup cream\nDirections\n1. Chop.\n2. Simmer.").attributes
+
+    assert_equal [ "Soup", 4, 10, "Chop.\nSimmer." ], attributes.values_at(:name, :servings, :prep_time, :instructions)
+    onion, garnish, cream = attributes[:ingredients_attributes]
+    assert_equal [ "onion", false ], [ onion[:name], onion[:section].present? ]
+    assert_equal [ "For the garnish", true ], [ garnish[:name], garnish[:section] ]
+    assert_equal "cream", cream[:name]
+    assert_equal [ 0, 1, 2 ], attributes[:ingredients_attributes].map { |row| row[:position] }
+  end
+
+  test "lines the cook has sorted are used exactly as given, whatever the reader would have guessed" do
+    lines = [ { text: "Pasta", role: "title" }, { text: "boil water", role: "ingredient" }, { text: "Salt the water", role: "skip" }, { text: "Serves 2", role: "step" }, { text: "?", role: "nonsense" }, { text: "  ", role: "step" } ]
+    import = RecipeImport.new(lines:)
+
+    assert import.confident?, "the cook's sorting is not second-guessed"
+    assert_equal [ "title", "ingredient", "skip", "step", "skip" ], import.lines.map(&:role)
+    attributes = import.attributes
+    assert_equal [ "Pasta", "Serves 2" ], attributes.values_at(:name, :instructions)
+    assert_equal [ "boil water" ], attributes[:ingredients_attributes].map { |row| row[:name] }
+  end
+
+  test "text with nothing to read is a failure" do
+    assert_raises(RecipeImport::Failed) { RecipeImport.new(lines: [ { text: " ", role: "step" } ]).attributes }
+  end
 end
