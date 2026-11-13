@@ -71,4 +71,28 @@ class RecipeTest < ActiveSupport::TestCase
     assert_equal 2, @recipe.rating_by(@reader)
     assert_nil @recipe.rating_by(@author)
   end
+
+  test "scale_key falls back to 1 for anything unknown" do
+    assert_equal "2", Recipe.scale_key("2")
+    assert_equal "0.5", Recipe.scale_key("0.5")
+    assert_equal "1", Recipe.scale_key("7")
+    assert_equal "1", Recipe.scale_key(nil)
+  end
+
+  test "source link must be an http or https address" do
+    %w[https://example.com/pie http://example.com].each do |url|
+      assert @recipe.tap { |r| r.source_url = url }.valid?, url
+    end
+    [ "javascript:alert(1)", "https://x.com javascript:alert(1)", "ftp://example.com/pie", "not a url" ].each do |url|
+      assert_not @recipe.tap { |r| r.source_url = url }.valid?, url
+    end
+    assert @recipe.tap { |r| r.source_url = "" }.valid?
+  end
+
+  test "source_host" do
+    @recipe.source_url = "https://www.example.com/a/pie"
+    assert_equal "www.example.com", @recipe.source_host
+    @recipe.source_url = nil
+    assert_nil @recipe.source_host
+  end
 end

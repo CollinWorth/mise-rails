@@ -43,4 +43,18 @@ class MealPlanTest < ApplicationSystemTestCase
     assert_text "Added Greek Salad"
     assert_equal Date.current + 1, @cook.planned_meals.last.date
   end
+
+  test "today is highlighted in the planner" do
+    visit planned_meals_path
+    assert_selector "[data-controller~=scroll-into-view]", text: "Today"
+  end
+
+  test "a recipe's ingredients go on the grocery list from its page" do
+    @salad.ingredients.create!(name: "feta", quantity: "150", unit: "g")
+    visit recipe_path(@salad)
+    click_button "Add to grocery list"
+
+    assert_text "Added 1 ingredients to your grocery list."
+    assert_equal "150", @cook.grocery_list.items.find_by(name: "feta").quantity
+  end
 end
