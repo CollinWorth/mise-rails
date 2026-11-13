@@ -37,7 +37,7 @@ class Recipe < ApplicationRecord
   scope :published, -> { where(public: true, original_id: nil) }
   scope :visible_to, ->(user) { where(public: true).or(where(user:)) }
   scope :newest, -> { order(id: :desc) }
-  scope :search, ->(query) { where("recipes.name LIKE :q OR recipes.tags LIKE :q OR recipes.cuisine LIKE :q", q: "%#{sanitize_sql_like(query.strip)}%") if query.present? }
+  scope :search, ->(query) { where("LOWER(recipes.name) LIKE :q OR LOWER(recipes.tags) LIKE :q OR LOWER(recipes.cuisine) LIKE :q", q: "%#{sanitize_sql_like(query.strip.downcase)}%") if query.present? }
 
   # A saved copy shares ratings with the recipe it came from.
   def rated_recipe = original || self

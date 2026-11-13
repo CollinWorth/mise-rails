@@ -22,7 +22,7 @@ class User < ApplicationRecord
 
   after_create :create_grocery_list
 
-  scope :named_like, ->(query) { where("name LIKE ?", "%#{sanitize_sql_like(query.strip)}%") }
+  scope :named_like, ->(query) { where("LOWER(name) LIKE ?", "%#{sanitize_sql_like(query.strip.downcase)}%") }
 
   def pantry_keys = pantry_items.pluck(:normalized_name)
 
