@@ -9,17 +9,11 @@ class SmallThingsTest < ActionDispatch::IntegrationTest
 
   test "the recipe page scales quantities and ignores unknown scales" do
     get recipe_path(@recipe, scale: "2")
-    assert_select "p", text: "4 onion"
-    assert_select "p", text: "a pinch salt"
-    assert_select "a[href*='/cook?scale=2']"
+    assert_select "label span", text: "4 onion"
+    assert_select "label span", text: "a pinch salt"
 
     get recipe_path(@recipe, scale: "banana")
-    assert_select "p", text: "2 onion"
-  end
-
-  test "cook mode scales too" do
-    get recipe_cook_path(@recipe, scale: "3")
-    assert_select "label", text: "6 onion"
+    assert_select "label span", text: "2 onion"
   end
 
   test "adding a recipe to the grocery list scales and merges" do

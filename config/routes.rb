@@ -24,7 +24,6 @@ Rails.application.routes.draw do
     resource :like, only: %i[create destroy]
     resource :rating, only: %i[update destroy]
     resource :copy, only: :create
-    resource :cook, only: :show
     resources :comments, only: %i[create destroy]
   end
 

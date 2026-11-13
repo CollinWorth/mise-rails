@@ -1,14 +1,15 @@
 # A recipe thumbnail: the whole card opens the recipe (a stretched link), and the + button plans it without opening.
 class Components::RecipeCard < Components::Base
-  def initialize(recipe:, show_author: false)
+  def initialize(recipe:, show_author: false, eager: false)
     @recipe = recipe
+    @eager = eager
     @show_author = show_author
   end
 
   def view_template
     Card(class: "group relative overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:shadow-md") do
       div(class: "relative overflow-hidden") do
-        RecipeImage(recipe: @recipe, class: "transition duration-300 group-hover:scale-105")
+        RecipeImage(recipe: @recipe, eager: @eager, class: "transition duration-300 group-hover:scale-105")
         plan_button if Current.user
       end
       CardHeader(class: "gap-1 p-4 pb-2") do

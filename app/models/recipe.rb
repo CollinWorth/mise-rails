@@ -9,8 +9,9 @@ class Recipe < ApplicationRecord
   has_many :planned_meals, dependent: :destroy
   has_many :grocery_item_sources, dependent: :nullify
   has_one_attached :image do |attachable|
-    attachable.variant :card, resize_to_fill: [ 640, 360 ]
-    attachable.variant :large, resize_to_limit: [ 1200, 1200 ]
+    # Small WebP versions, made right after upload (and by `bin/rails images:variants` for existing photos) so no one waits on the first view.
+    attachable.variant :card, resize_to_fill: [ 640, 360 ], format: :webp, saver: { quality: 78 }, preprocessed: true
+    attachable.variant :hero, resize_to_fill: [ 900, 675 ], format: :webp, saver: { quality: 80 }, preprocessed: true
   end
 
   accepts_nested_attributes_for :ingredients, allow_destroy: true, reject_if: ->(attrs) { attrs["name"].blank? }

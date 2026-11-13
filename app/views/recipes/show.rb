@@ -6,17 +6,20 @@ class Views::Recipes::Show < Views::Base
 
   def view_template
     Grid(columns: :hero) do
-      RecipeImage(recipe: @recipe, size: :hero, class: "rounded-xl")
+      RecipeImage(recipe: @recipe, size: :hero, eager: true, class: "rounded-xl")
       Stack(gap: :lg) do
         title_block
         Row(gap: :sm) { actions }
         reactions
       end
     end
-    Grid(columns: :aside) do
+    Grid(columns: :aside, data: { controller: "checklist", checklist_key_value: "recipe-#{@recipe.id}", action: "turbo:render@document->checklist#restore" }) do
       ingredients
       Stack do
-        Heading(level: 2) { "Instructions" }
+        Row(justify: :between) do
+          Heading(level: 2) { "Instructions" }
+          Button(type: :button, variant: :ghost, size: :sm, class: "text-muted-foreground", data: { action: "checklist#clear" }) { "Clear ticks" }
+        end
         Steps(steps: @recipe.steps)
       end
     end
@@ -52,12 +55,8 @@ class Views::Recipes::Show < Views::Base
     end
 
     def actions
-      Link(href: recipe_cook_path(@recipe, scale: @scale.to_param), variant: :primary, size: :lg, class: "gap-2") do
-        Icon(:flame, class: "size-4")
-        plain "Cook"
-      end
       if Current.user
-        SheetLink(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :outline, size: :lg) { "Add to plan" }
+        SheetLink(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :primary, size: :lg) { "Add to plan" }
         ButtonTo(action: recipe_grocery_items_path(@recipe), params: { scale: @scale.key }, size: :lg) { "Add to grocery list" }
       end
       more_menu if Current.user || @recipe.public?
@@ -91,7 +90,10 @@ class Views::Recipes::Show < Views::Base
               if ingredient.section?
                 Heading(level: 4, class: "mt-2 text-sm uppercase tracking-wide text-muted-foreground") { ingredient.name }
               else
-                Text { ingredient.to_line(@scale.factor) }
+                label(class: "flex cursor-pointer items-start gap-3 py-0.5 has-[:checked]:text-muted-foreground has-[:checked]:line-through") do
+                  Checkbox(value: "i#{ingredient.id}", class: "mt-1.5", data: { checklist_target: "item", action: "change->checklist#save" })
+                  span { ingredient.to_line(@scale.factor) }
+                end
               end
             end
           end

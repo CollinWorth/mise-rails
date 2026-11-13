@@ -12,12 +12,12 @@ class ReactionsTest < ApplicationSystemTestCase
     assert_equal [ false, false, false ], star_buttons.call
 
     all("button", text: "★")[1].click
-    assert_selector "button", text: "Clear"
+    assert_selector "button", exact_text: "Clear"
     assert_equal [ true, true, false ], star_buttons.call
     assert_equal 2, @recipe.reload.average_rating
 
-    click_button "Clear"
-    assert_no_selector "button", text: "Clear"
+    click_button "Clear", exact: true
+    assert_no_selector "button", exact_text: "Clear"
     assert_equal [ false, false, false ], star_buttons.call
   end
 
@@ -64,7 +64,7 @@ class ReactionsTest < ApplicationSystemTestCase
     page.execute_script("window.scrollTo(0, 260)")
 
     all("button", text: "★")[1].click
-    assert_selector "button", text: "Clear"
+    assert_selector "button", exact_text: "Clear"
     assert_equal "2", URI.parse(current_url).query.to_s[/scale=(\d)/, 1]
     assert_in_delta 260, page.evaluate_script("Math.round(scrollY)"), 60
   end

@@ -20,6 +20,6 @@ Views contain no raw HTML or CSS: they use Ruby UI components plus the layout ki
 ## Layout
 
 - `app/models` – domain logic: `Recipe` (copies, ratings, visibility), `GroceryList#add_meals`, `Quantity`, `RecipeImport`
-- `app/controllers` – resourceful controllers only (likes, ratings, copies, cook mode, grocery items are their own resources)
+- `app/controllers` – resourceful controllers only (likes, ratings, copies, grocery items are their own resources)
 - `app/views` – one Phlex view per page; `app/components` – shared components
 - `config/grocery_categories.yml` – aisle order and keywords for sorting the grocery list

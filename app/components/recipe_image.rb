@@ -11,18 +11,23 @@ class Components::RecipeImage < Components::Base
     "from-fuchsia-400/30 to-pink-300/20 text-fuchsia-600 dark:text-fuchsia-300"
   ].freeze
 
-  # :card is a 16:9 thumbnail; :hero fills the recipe page's photo column.
+  # :card is a 16:9 thumbnail; :hero fills the recipe page's photo column. Pixel sizes match the variants in Recipe.
   SHAPES = { card: "aspect-video", hero: "aspect-[4/3]" }.freeze
+  PIXELS = { card: [ 640, 360 ], hero: [ 900, 675 ] }.freeze
 
-  def initialize(recipe:, size: :card, **attrs)
+  # `eager` is for photos already on screen when the page opens; the rest load as they scroll into view.
+  def initialize(recipe:, size: :card, eager: false, **attrs)
     @recipe = recipe
     @size = size
+    @eager = eager
     @attrs = attrs
   end
 
   def view_template
     if photo?
-      img(src: url_for(@recipe.image.variant(@size == :card ? :card : :large)), alt: @recipe.name, loading: "lazy", class: [ "w-full object-cover", SHAPES.fetch(@size), @attrs[:class] ])
+      width, height = PIXELS.fetch(@size)
+      img(src: url_for(@recipe.image.variant(@size)), alt: @recipe.name, width:, height:, decoding: "async", loading: (@eager ? "eager" : "lazy"), fetchpriority: (@eager ? "high" : "auto"),
+          class: [ "w-full object-cover", SHAPES.fetch(@size), @attrs[:class] ])
     else
       div(class: [ "flex w-full items-center justify-center bg-gradient-to-br", SHAPES.fetch(@size), TILES[@recipe.name.to_s.sum % TILES.size], @attrs[:class] ], aria_hidden: "true") do
         span(class: "text-5xl font-bold") { @recipe.name.to_s.strip[0].to_s.upcase }
