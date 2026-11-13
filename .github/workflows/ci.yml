@@ -84,10 +84,20 @@ jobs:
       - name: Build Tailwind CSS
         run: bin/rails tailwindcss:build
 
+      - name: Prepare the test database
+        env:
+          RAILS_ENV: test
+        run: bin/rails db:test:prepare
+
       - name: Run tests
         env:
           RAILS_ENV: test
-        run: bin/rails db:test:prepare test test:system
+        run: bin/rails test
+
+      - name: Run browser tests
+        env:
+          RAILS_ENV: test
+        run: bin/rails test:system
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
