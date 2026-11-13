@@ -10,9 +10,9 @@ class PaletteIntegrationTest < ActionDispatch::IntegrationTest
     get recipes_path
     assert_select "html[data-palette=#{Palette::DEFAULT}]"
 
-    @cook.update!(palette: "amber")
+    @cook.update!(palette: "ocean")
     get recipes_path
-    assert_select "html[data-palette=amber]"
+    assert_select "html[data-palette=ocean]"
   end
 
   test "signed-out visitors get the default palette" do
@@ -22,11 +22,11 @@ class PaletteIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "choosing a palette on the profile saves it" do
-    patch profile_path, params: { user: { palette: "spruce" } }
+    patch profile_path, params: { user: { palette: "forest" } }
 
     assert_redirected_to profile_path
     assert_equal "Palette changed.", flash[:notice]
-    assert_equal "spruce", @cook.reload.palette
+    assert_equal "forest", @cook.reload.palette
   end
 
   test "an unknown palette is refused and nothing changes" do
@@ -37,11 +37,11 @@ class PaletteIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "the profile lists every palette with the current one selected" do
-    @cook.update!(palette: "pastel")
+    @cook.update!(palette: "plum")
     get profile_path
 
     assert_select "input[type=radio][name='user[palette]']", count: Palette.keys.size
-    assert_select "input[type=radio][value=pastel][checked]"
+    assert_select "input[type=radio][value=plum][checked]"
     Palette::NAMES.each_value { |name| assert_select "label", text: name }
   end
 

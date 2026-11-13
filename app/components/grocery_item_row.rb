@@ -28,7 +28,7 @@ class Components::GroceryItemRow < Components::Base
     end
 
     def check_circle
-      span(class: [ "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition", (@item.checked? ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/40") ]) do
+      span(class: [ "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition", (@item.checked? ? "border-brand-2 bg-brand-2 text-brand-2-foreground" : "border-muted-foreground/40") ]) do
         Icon(:check, class: "size-3") if @item.checked?
       end
     end

@@ -1,5 +1,5 @@
 # The color palettes people can pick in their profile. The colors themselves are in
-# app/assets/tailwind/palettes.css (five hex colors per light and dark mode); this list only names them.
+# app/assets/tailwind/palettes.css (seven hex colors per light and dark mode: page, text, main color, a tint, and two accents); this list only names them.
 # To add one: paste a block in that file and add a line here.
 class Palette
   DEFAULT = "ember"
@@ -7,10 +7,11 @@ class Palette
   NAMES = {
     "ember" => "Ember",
     "harvest" => "Autumn Harvest",
-    "terracotta" => "Terracotta & Teal",
-    "pastel" => "Retro Pastel",
-    "amber" => "Amber Night",
-    "spruce" => "Spruce & Walnut",
+    "ocean" => "Ocean",
+    "plum" => "Plum",
+    "forest" => "Forest",
+    "rose" => "Rose",
+    "indigo" => "Indigo",
     "classic" => "Classic"
   }.freeze
 

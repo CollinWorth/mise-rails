@@ -40,7 +40,7 @@ class Views::GroceryLists::Show < Views::Base
         next unless (aisle_items = by_category[key])
 
         Card do
-          CardHeader { CardTitle { config["label"] } }
+          CardHeader { CardTitle(class: "text-brand-2") { config["label"] } }
           CardContent { Stack(gap: :sm) { aisle_items.each { |item| GroceryItemRow(item:) } } }
         end
       end

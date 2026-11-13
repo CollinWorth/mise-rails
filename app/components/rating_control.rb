@@ -11,7 +11,7 @@ class Components::RatingControl < Components::Base
       Row(gap: :sm, class: "gap-0") do
         (1..3).each do |value|
           ButtonTo(action: recipe_rating_path(@recipe), method: :put, params: { value: }, variant: :ghost,
-                   button_class: [ "px-1.5 text-xl", (@user_rating.to_i >= value ? "text-primary" : "text-muted-foreground/50") ]) { "★" }
+                   button_class: [ "px-1.5 text-xl", (@user_rating.to_i >= value ? "text-brand-3" : "text-muted-foreground/50") ]) { "★" }
         end
       end
       ButtonTo(action: recipe_rating_path(@recipe), method: :delete, variant: :ghost, button_class: "text-xs text-muted-foreground") { "Clear" } if @user_rating

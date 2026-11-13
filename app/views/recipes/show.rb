@@ -1,4 +1,8 @@
 class Views::Recipes::Show < Views::Base
+  # Times and servings use the palette's secondary color; cuisine, category and rating use its tertiary one.
+  SECONDARY_BADGE = "border-brand-2/30 bg-brand-2/10 text-brand-2".freeze
+  TERTIARY_BADGE = "border-brand-3/30 bg-brand-3/10 text-brand-3".freeze
+
   def initialize(recipe:, scale: Scale.default)
     @recipe = recipe
     @scale = scale
@@ -45,12 +49,12 @@ class Views::Recipes::Show < Views::Base
 
     def facts
       Row(gap: :sm) do
-        Badge(variant: :outline) { "Prep #{@recipe.prep_time} min" } if @recipe.prep_time
-        Badge(variant: :outline) { "Cook #{@recipe.cook_time} min" } if @recipe.cook_time
-        Badge(variant: :outline) { "Serves #{Quantity.format(@recipe.servings * @scale.factor)}" } if @recipe.servings
-        Badge(variant: :outline) { @recipe.cuisine } if @recipe.cuisine.present?
-        Badge(variant: :outline) { @recipe.category } if @recipe.category.present?
-        Badge(variant: :outline) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
+        Badge(variant: :outline, class: SECONDARY_BADGE) { "Prep #{@recipe.prep_time} min" } if @recipe.prep_time
+        Badge(variant: :outline, class: SECONDARY_BADGE) { "Cook #{@recipe.cook_time} min" } if @recipe.cook_time
+        Badge(variant: :outline, class: SECONDARY_BADGE) { "Serves #{Quantity.format(@recipe.servings * @scale.factor)}" } if @recipe.servings
+        Badge(variant: :outline, class: TERTIARY_BADGE) { @recipe.cuisine } if @recipe.cuisine.present?
+        Badge(variant: :outline, class: TERTIARY_BADGE) { @recipe.category } if @recipe.category.present?
+        Badge(variant: :outline, class: TERTIARY_BADGE) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
       end
     end
 
@@ -88,7 +92,7 @@ class Views::Recipes::Show < Views::Base
           Stack(gap: :sm) do
             @recipe.ingredients.each do |ingredient|
               if ingredient.section?
-                Heading(level: 4, class: "mt-2 text-sm uppercase tracking-wide text-muted-foreground") { ingredient.name }
+                Heading(level: 4, class: "mt-2 text-sm uppercase tracking-wide text-brand-3") { ingredient.name }
               else
                 label(class: "flex cursor-pointer items-start gap-3 py-0.5 has-[:checked]:text-muted-foreground has-[:checked]:line-through") do
                   Checkbox(value: "i#{ingredient.id}", class: "mt-1.5", data: { checklist_target: "item", action: "change->checklist#save" })

@@ -6,6 +6,6 @@ class Components::Avatar < Components::Base
   end
 
   def view_template
-    span(class: [ "inline-flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground", @size ], aria_hidden: "true") { @name.to_s.strip[0].to_s.upcase }
+    span(class: [ "inline-flex shrink-0 items-center justify-center rounded-full bg-brand-2 font-semibold text-brand-2-foreground", @size ], aria_hidden: "true") { @name.to_s.strip[0].to_s.upcase }
   end
 end

@@ -26,6 +26,10 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.68 0.15 42);
+  --brand-2: #0f766e;
+  --brand-2-foreground: #ffffff;
+  --brand-3: #a16207;
+  --brand-3-foreground: #ffffff;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -68,6 +72,10 @@
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.6 0.16 45);
+  --brand-2: #2dd4bf;
+  --brand-2-foreground: #0c0a09;
+  --brand-3: #fbbf24;
+  --brand-3-foreground: #0c0a09;
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -89,29 +97,33 @@
   --success-foreground: hsl(0 0% 100%);
 }
 
-/* Color palettes (see Palette). Each one sets five seed colors for light and for dark; the rule after them
-   derives every token from the seeds, so a new palette is just a block of hex codes. The same selectors also
-   apply to the swatches in the profile picker, which sit inside a data-palette wrapper. */
-[data-palette="ember"] { --p-bg: #ffffff; --p-fg: #1a1410; --p-primary: #c2410c; --p-primary-fg: #ffffff; --p-tint: #f1ddd0; }
-[data-palette="ember"].dark, .dark [data-palette="ember"] { --p-bg: #0c0a09; --p-fg: #f5efe9; --p-primary: #f97a2b; --p-primary-fg: #1a0e05; --p-tint: #5a2f17; }
+/* Color palettes (see Palette). Each one sets seven seed colors for light and for dark: page, text, main color
+   (and the text on it), a soft tint, and a secondary and a tertiary accent. The rule after them derives every
+   token from the seeds, so a new palette is just a block of hex codes. The same selectors also apply to the
+   swatches in the profile picker, which sit inside a data-palette wrapper. */
+[data-palette="ember"] { --p-bg: #ffffff; --p-fg: #1a1410; --p-primary: #c2410c; --p-primary-fg: #ffffff; --p-tint: #f1ddd0; --p-brand2: #0f766e; --p-brand3: #a16207; }
+[data-palette="ember"].dark, .dark [data-palette="ember"] { --p-bg: #0c0a09; --p-fg: #f5efe9; --p-primary: #f97a2b; --p-primary-fg: #1a0e05; --p-tint: #5a2f17; --p-brand2: #2dd4bf; --p-brand3: #fbbf24; }
 
-[data-palette="harvest"] { --p-bg: #fbf5e9; --p-fg: #442d1c; --p-primary: #743014; --p-primary-fg: #fbf5e9; --p-tint: #e8d1a7; }
-[data-palette="harvest"].dark, .dark [data-palette="harvest"] { --p-bg: #1e140d; --p-fg: #f3e6cc; --p-primary: #d9a25f; --p-primary-fg: #1e140d; --p-tint: #84592b; }
+[data-palette="harvest"] { --p-bg: #fbf5e9; --p-fg: #442d1c; --p-primary: #743014; --p-primary-fg: #fbf5e9; --p-tint: #e8d1a7; --p-brand2: #6a6b2a; --p-brand3: #84592b; }
+[data-palette="harvest"].dark, .dark [data-palette="harvest"] { --p-bg: #1e140d; --p-fg: #f3e6cc; --p-primary: #d9a25f; --p-primary-fg: #1e140d; --p-tint: #84592b; --p-brand2: #bdbd7a; --p-brand3: #e8d1a7; }
 
-[data-palette="terracotta"] { --p-bg: #faf5e6; --p-fg: #2a4343; --p-primary: #b8472a; --p-primary-fg: #faf5e6; --p-tint: #c0c29d; }
-[data-palette="terracotta"].dark, .dark [data-palette="terracotta"] { --p-bg: #162626; --p-fg: #f1e3c4; --p-primary: #e27a55; --p-primary-fg: #162626; --p-tint: #416b66; }
+[data-palette="ocean"] { --p-bg: #f2f9fb; --p-fg: #0b2a33; --p-primary: #0e7490; --p-primary-fg: #f2f9fb; --p-tint: #bfe6ee; --p-brand2: #be3b4a; --p-brand3: #8a6a12; }
+[data-palette="ocean"].dark, .dark [data-palette="ocean"] { --p-bg: #07161b; --p-fg: #e3f4f8; --p-primary: #38bdf8; --p-primary-fg: #07161b; --p-tint: #164e63; --p-brand2: #fb7185; --p-brand3: #fcd34d; }
 
-[data-palette="pastel"] { --p-bg: #fbf8f0; --p-fg: #3b2f25; --p-primary: #c23f1a; --p-primary-fg: #fbf8f0; --p-tint: #accab2; }
-[data-palette="pastel"].dark, .dark [data-palette="pastel"] { --p-bg: #231e19; --p-fg: #f4ebdd; --p-primary: #e9a752; --p-primary-fg: #231e19; --p-tint: #78614d; }
+[data-palette="plum"] { --p-bg: #fcf6fb; --p-fg: #2b1030; --p-primary: #86198f; --p-primary-fg: #fcf6fb; --p-tint: #ecd3f0; --p-brand2: #3f6212; --p-brand3: #b45309; }
+[data-palette="plum"].dark, .dark [data-palette="plum"] { --p-bg: #1a0b1f; --p-fg: #f6e6f8; --p-primary: #e879f9; --p-primary-fg: #1a0b1f; --p-tint: #581c87; --p-brand2: #a3e635; --p-brand3: #fdba74; }
 
-[data-palette="amber"] { --p-bg: #f7f1e7; --p-fg: #13191f; --p-primary: #7a5a3c; --p-primary-fg: #f7f1e7; --p-tint: #ca9c68; }
-[data-palette="amber"].dark, .dark [data-palette="amber"] { --p-bg: #13191f; --p-fg: #efe3d1; --p-primary: #ca9c68; --p-primary-fg: #13191f; --p-tint: #594c3d; }
+[data-palette="forest"] { --p-bg: #f6f6ec; --p-fg: #1c2a18; --p-primary: #25401f; --p-primary-fg: #f6f6ec; --p-tint: #c9d2a8; --p-brand2: #b3452b; --p-brand3: #8a6100; }
+[data-palette="forest"].dark, .dark [data-palette="forest"] { --p-bg: #101a0f; --p-fg: #e9eed9; --p-primary: #a3b77f; --p-primary-fg: #101a0f; --p-tint: #3a4d2c; --p-brand2: #f08a6a; --p-brand3: #e7c45a; }
 
-[data-palette="spruce"] { --p-bg: #f8f5ec; --p-fg: #1f2d1b; --p-primary: #25401f; --p-primary-fg: #f8f5ec; --p-tint: #8c946b; }
-[data-palette="spruce"].dark, .dark [data-palette="spruce"] { --p-bg: #121a10; --p-fg: #edefe0; --p-primary: #a3b77f; --p-primary-fg: #121a10; --p-tint: #885f38; }
+[data-palette="rose"] { --p-bg: #fff7f8; --p-fg: #3b0a17; --p-primary: #be123c; --p-primary-fg: #fff7f8; --p-tint: #fbd0d9; --p-brand2: #0f766e; --p-brand3: #b45309; }
+[data-palette="rose"].dark, .dark [data-palette="rose"] { --p-bg: #1f0a10; --p-fg: #fde8ec; --p-primary: #fb7185; --p-primary-fg: #1f0a10; --p-tint: #6b1a2c; --p-brand2: #5eead4; --p-brand3: #fcd34d; }
 
-[data-palette="classic"] { --p-bg: #ffffff; --p-fg: #171717; --p-primary: #171717; --p-primary-fg: #fafafa; --p-tint: #e5e5e5; }
-[data-palette="classic"].dark, .dark [data-palette="classic"] { --p-bg: #0a0a0a; --p-fg: #fafafa; --p-primary: #fafafa; --p-primary-fg: #171717; --p-tint: #404040; }
+[data-palette="indigo"] { --p-bg: #f6f7ff; --p-fg: #14163a; --p-primary: #4338ca; --p-primary-fg: #f6f7ff; --p-tint: #d0d4fb; --p-brand2: #047857; --p-brand3: #b45309; }
+[data-palette="indigo"].dark, .dark [data-palette="indigo"] { --p-bg: #0d0f24; --p-fg: #e8eaff; --p-primary: #818cf8; --p-primary-fg: #0d0f24; --p-tint: #2f3380; --p-brand2: #34d399; --p-brand3: #fbbf24; }
+
+[data-palette="classic"] { --p-bg: #ffffff; --p-fg: #171717; --p-primary: #171717; --p-primary-fg: #fafafa; --p-tint: #e5e5e5; --p-brand2: #2563eb; --p-brand3: #15803d; }
+[data-palette="classic"].dark, .dark [data-palette="classic"] { --p-bg: #0a0a0a; --p-fg: #fafafa; --p-primary: #fafafa; --p-primary-fg: #171717; --p-tint: #404040; --p-brand2: #60a5fa; --p-brand3: #4ade80; }
 
 [data-palette] {
   --background: var(--p-bg);
@@ -122,6 +134,10 @@
   --popover-foreground: var(--p-fg);
   --primary: var(--p-primary);
   --primary-foreground: var(--p-primary-fg);
+  --brand-2: var(--p-brand2);
+  --brand-2-foreground: var(--p-bg);
+  --brand-3: var(--p-brand3);
+  --brand-3-foreground: var(--p-bg);
   --secondary: color-mix(in oklab, var(--p-tint) 40%, var(--p-bg));
   --secondary-foreground: var(--p-fg);
   --accent: color-mix(in oklab, var(--p-tint) 40%, var(--p-bg));
@@ -141,6 +157,10 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-brand-2: var(--brand-2);
+  --color-brand-2-foreground: var(--brand-2-foreground);
+  --color-brand-3: var(--brand-3);
+  --color-brand-3-foreground: var(--brand-3-foreground);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);

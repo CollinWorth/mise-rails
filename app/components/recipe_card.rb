@@ -18,9 +18,9 @@ class Components::RecipeCard < Components::Base
       end
       CardContent(class: "p-4 pt-0") do
         Row(gap: :sm, class: "text-xs text-muted-foreground") do
-          span(class: "inline-flex items-center gap-1") { Icon(:clock, class: "size-3.5"); plain "#{@recipe.total_time} min" } if @recipe.total_time.positive?
+          span(class: "inline-flex items-center gap-1 text-brand-2") { Icon(:clock, class: "size-3.5"); plain "#{@recipe.total_time} min" } if @recipe.total_time.positive?
           span { @recipe.cuisine } if @recipe.cuisine.present?
-          span(class: "font-medium text-foreground") { "★ #{@recipe.average_rating}" } if @recipe.average_rating
+          span(class: "font-medium text-brand-3") { "★ #{@recipe.average_rating}" } if @recipe.average_rating
           Badge(variant: :outline) { "Private" } unless @recipe.public?
         end
       end

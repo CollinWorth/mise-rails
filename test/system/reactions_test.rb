@@ -8,7 +8,7 @@ class ReactionsTest < ApplicationSystemTestCase
   end
 
   test "clicking a star rates the recipe and clear removes it" do
-    star_buttons = -> { all("button", text: "★").map { |button| button[:class].split.include?("text-primary") } }
+    star_buttons = -> { all("button", text: "★").map { |button| button[:class].split.include?("text-brand-3") } }
     assert_equal [ false, false, false ], star_buttons.call
 
     all("button", text: "★")[1].click

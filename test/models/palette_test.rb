@@ -7,7 +7,7 @@ class PaletteTest < ActiveSupport::TestCase
   def seeds(key, dark:)
     selector = dark ? %(\\[data-palette="#{key}"\\]\\.dark, \\.dark \\[data-palette="#{key}"\\]) : %(\\[data-palette="#{key}"\\])
     block = CSS[/^#{selector} \{([^}]*)\}/, 1] or flunk "#{key} has no #{dark ? 'dark' : 'light'} block in application.css"
-    block.scan(/(--p-[a-z-]+): (#[0-9a-f]{6})/).to_h
+    block.scan(/(--p-[a-z0-9-]+): (#[0-9a-f]{6})/).to_h
   end
 
   def luminance(hex)
@@ -29,7 +29,7 @@ class PaletteTest < ActiveSupport::TestCase
   test "every palette has light and dark colors in the stylesheet" do
     Palette.keys.each do |key|
       [ false, true ].each do |dark|
-        assert_equal %w[--p-bg --p-fg --p-primary --p-primary-fg --p-tint], seeds(key, dark:).keys.sort, "#{key} #{dark ? 'dark' : 'light'}"
+        assert_equal %w[--p-bg --p-brand2 --p-brand3 --p-fg --p-primary --p-primary-fg --p-tint], seeds(key, dark:).keys.sort, "#{key} #{dark ? 'dark' : 'light'}"
       end
     end
   end
@@ -42,6 +42,8 @@ class PaletteTest < ActiveSupport::TestCase
         assert_operator contrast(colors["--p-fg"], colors["--p-bg"]), :>=, 7, "text on the page in #{mode}"
         assert_operator contrast(colors["--p-primary-fg"], colors["--p-primary"]), :>=, 4.5, "button text in #{mode}"
         assert_operator contrast(colors["--p-primary"], colors["--p-bg"]), :>=, 3, "buttons and links against the page in #{mode}"
+        assert_operator contrast(colors["--p-brand2"], colors["--p-bg"]), :>=, 4.5, "secondary color as text in #{mode}"
+        assert_operator contrast(colors["--p-brand3"], colors["--p-bg"]), :>=, 4.5, "tertiary color as text in #{mode}"
       end
     end
   end
