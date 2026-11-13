@@ -3,6 +3,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :recipes, dependent: :destroy
   has_many :likes, dependent: :destroy
+  has_many :pantry_items, dependent: :destroy
   has_many :ratings, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :planned_meals, dependent: :destroy
@@ -22,6 +23,8 @@ class User < ApplicationRecord
   after_create :create_grocery_list
 
   scope :named_like, ->(query) { where("name LIKE ?", "%#{sanitize_sql_like(query.strip)}%") }
+
+  def pantry_keys = pantry_items.pluck(:normalized_name)
 
   def following?(user) = following.exists?(user.id)
 end

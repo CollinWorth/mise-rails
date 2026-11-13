@@ -54,7 +54,7 @@ class MealPlanTest < ApplicationSystemTestCase
     visit recipe_path(@salad)
     click_button "Add to grocery list"
 
-    assert_text "Added 1 ingredients to your grocery list."
+    assert_text "Added 1 item."
     assert_equal "150", @cook.grocery_list.items.find_by(name: "feta").quantity
   end
 end

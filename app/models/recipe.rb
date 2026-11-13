@@ -7,6 +7,7 @@ class Recipe < ApplicationRecord
   has_many :ratings, dependent: :destroy
   has_many :comments, -> { order(:created_at) }, dependent: :destroy
   has_many :planned_meals, dependent: :destroy
+  has_many :grocery_item_sources, dependent: :nullify
   has_one_attached :image do |attachable|
     attachable.variant :card, resize_to_fill: [ 640, 360 ]
     attachable.variant :large, resize_to_limit: [ 1200, 1200 ]

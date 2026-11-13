@@ -30,11 +30,15 @@ Rails.application.routes.draw do
 
   resources :planned_meals, only: %i[index new create destroy]
 
+  resources :pantry_items, path: "pantry", only: %i[index create destroy]
+
   resource :grocery_list, only: :show do
     scope module: :grocery_lists do
-      resources :items, only: %i[create edit update destroy]
+      resources :items, only: %i[create show edit update destroy]
       resource :checked_items, only: :destroy
-      resource :meal_plan, only: :create
+      resource :meal_plan, only: %i[new create] do
+        resources :pantry_items, only: :create, module: :meal_plans
+      end
     end
   end
 

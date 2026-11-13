@@ -88,6 +88,9 @@ RECIPES.each_with_index do |(slug, name, cuisine, category, prep, cook, servings
   recipe.image.attach(io: image.open, filename: "#{slug}.jpg", content_type: "image/jpeg") if image.exist?
 end
 
+# Staples this cook always has, so the grocery list leaves them off.
+[ "salt", "black pepper", "olive oil", "flour" ].each { |name| cooks.first.pantry_items.find_or_create_by!(name:) }
+
 # A few likes, follows and ratings so Discover and the follower lists have something to show.
 cooks.each { |cook| (cooks - [ cook ]).each { |other| cook.follows.find_or_create_by!(followed: other) } }
 Recipe.published.limit(10).each_with_index do |recipe, index|

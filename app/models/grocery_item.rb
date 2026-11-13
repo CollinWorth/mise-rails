@@ -5,6 +5,7 @@ class GroceryItem < ApplicationRecord
   include Quantified
 
   belongs_to :grocery_list
+  has_many :sources, -> { order(:planned_on, :id) }, class_name: "GroceryItemSource", dependent: :destroy
 
   validates :name, presence: true
   validates :category, inclusion: { in: CATEGORIES.keys }

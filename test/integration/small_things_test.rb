@@ -28,7 +28,7 @@ class SmallThingsTest < ActionDispatch::IntegrationTest
     post recipe_grocery_items_path(@recipe), params: { scale: "2" }, headers: { "HTTP_REFERER" => recipe_url(@recipe) }
 
     assert_redirected_to recipe_url(@recipe)
-    assert_match(/Added 2 ingredients/, flash[:notice])
+    assert_match(/Added 2 items/, flash[:notice])
     assert_equal "5", @cook.grocery_list.items.find_by(name: "onion").quantity
     assert_equal "a pinch", @cook.grocery_list.items.find_by(name: "salt").quantity
   end

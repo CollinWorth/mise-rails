@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_12_235748) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_13_003622) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -59,6 +59,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_235748) do
     t.index ["follower_id"], name: "index_follows_on_follower_id"
   end
 
+  create_table "grocery_item_sources", force: :cascade do |t|
+    t.integer "grocery_item_id", null: false
+    t.integer "recipe_id"
+    t.string "recipe_name", null: false
+    t.date "planned_on"
+    t.string "quantity"
+    t.string "unit"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["grocery_item_id"], name: "index_grocery_item_sources_on_grocery_item_id"
+    t.index ["recipe_id"], name: "index_grocery_item_sources_on_recipe_id"
+  end
+
   create_table "grocery_items", force: :cascade do |t|
     t.integer "grocery_list_id", null: false
     t.string "name", null: false
@@ -98,6 +111,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_235748) do
     t.index ["recipe_id"], name: "index_likes_on_recipe_id"
     t.index ["user_id", "recipe_id"], name: "index_likes_on_user_id_and_recipe_id", unique: true
     t.index ["user_id"], name: "index_likes_on_user_id"
+  end
+
+  create_table "pantry_items", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name", null: false
+    t.string "normalized_name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "normalized_name"], name: "index_pantry_items_on_user_id_and_normalized_name", unique: true
+    t.index ["user_id"], name: "index_pantry_items_on_user_id"
   end
 
   create_table "planned_meals", force: :cascade do |t|
@@ -166,11 +189,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_235748) do
   add_foreign_key "comments", "users"
   add_foreign_key "follows", "users", column: "followed_id"
   add_foreign_key "follows", "users", column: "follower_id"
+  add_foreign_key "grocery_item_sources", "grocery_items"
+  add_foreign_key "grocery_item_sources", "recipes", on_delete: :nullify
   add_foreign_key "grocery_items", "grocery_lists"
   add_foreign_key "grocery_lists", "users"
   add_foreign_key "ingredients", "recipes"
   add_foreign_key "likes", "recipes"
   add_foreign_key "likes", "users"
+  add_foreign_key "pantry_items", "users"
   add_foreign_key "planned_meals", "recipes"
   add_foreign_key "planned_meals", "users"
   add_foreign_key "ratings", "recipes"

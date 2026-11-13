@@ -11,6 +11,13 @@ class ApplicationController < ActionController::Base
   end
 
   private
+    # A date from the query string, or nil if it's missing or not a date.
+    def date_param(key = :date)
+      Date.iso8601(params[key]) if params[key].present?
+    rescue Date::Error
+      nil
+    end
+
     # Sheets (see Components::Sheet) load into the layout's `modal` Turbo Frame.
     # Opened any other way, they send you to the page they belong over instead.
     def render_sheet(fallback:)

@@ -17,8 +17,10 @@ export default class extends Controller {
   }
 
   // Search forms (GET) also bubble submit events; only a real submission closes the sheet.
+  // A submit button marked data-keep-open (it updates the sheet in place) doesn't.
   closing(event) {
     if (event.target.method?.toLowerCase() !== "post") return
+    if (event.detail.formSubmission.submitter?.dataset.keepOpen) return
 
     document.addEventListener("turbo:before-render", this.holdRender, { once: true })
   }

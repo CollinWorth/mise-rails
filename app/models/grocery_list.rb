@@ -2,37 +2,52 @@ class GroceryList < ApplicationRecord
   belongs_to :user
   has_many :items, -> { order(:checked, :category, :name) }, class_name: "GroceryItem", dependent: :destroy
 
-  # Adds every ingredient of the given meals, scaling by multiplier and merging
-  # with items already on the list. Returns how many items were added or merged.
-  def add_meals(planned_meals)
-    add_recipes(planned_meals.includes(recipe: :ingredients).map { |meal| [ meal.recipe, meal.multiplier ] })
+  # What an add did, for the message shown afterwards.
+  Result = Data.define(:added, :in_pantry) do
+    def summary
+      note = " (#{in_pantry} already in your pantry)" if in_pantry.positive?
+      return "Nothing to add#{note}." if added.zero?
+
+      "Added #{added} #{'item'.pluralize(added)}#{note}."
+    end
   end
 
-  # Same for [recipe, multiplier] pairs, e.g. one recipe at 2x.
-  def add_recipes(recipes_with_multipliers)
-    needed = Hash.new { |hash, name| hash[name] = { amount: 0r, unit: nil, text: nil } }
+  # Adds every ingredient of the given meals, scaling by multiplier and merging
+  # with items already on the list.
+  def add_meals(planned_meals, only: nil)
+    add_recipes(planned_meals.map { |meal| [ meal.recipe, meal.multiplier, meal.date ] }, only:)
+  end
 
-    recipes_with_multipliers.each do |recipe, multiplier|
-      recipe.ingredients.reject(&:section).each do |ingredient|
-        entry = needed[ingredient.name.strip.downcase]
-        entry[:unit] ||= ingredient.unit
-        if (amount = ingredient.amount)
-          entry[:amount] += amount * multiplier
-        else
-          entry[:text] ||= ingredient.quantity
-        end
+  # Same for [recipe, multiplier] or [recipe, multiplier, planned_on] groups, e.g. one recipe at 2x.
+  # `only` is a list of ingredient keys the user picked; without it, everything except pantry items is added.
+  def add_recipes(groups, only: nil)
+    pantry = only ? [] : user.pantry_keys
+    added = in_pantry = 0
+
+    IngredientTotals.new(groups).each do |entry|
+      next if only && !only.include?(entry.key)
+
+      if pantry.include?(entry.key)
+        in_pantry += 1
+      else
+        merge_item(entry)
+        added += 1
       end
     end
 
-    needed.each { |name, entry| merge_item(name, entry) }.size
+    Result.new(added:, in_pantry:)
   end
 
   private
-    def merge_item(name, entry)
-      item = items.find_or_initialize_by(name:)
-      total = (item.amount || 0r) + entry[:amount]
-      item.quantity = total.zero? ? entry[:text] : Quantity.format(total)
-      item.unit ||= entry[:unit]
+    def merge_item(entry)
+      item = items.detect { |existing| IngredientName.normalize(existing.name) == entry.key } || items.build(name: entry.name)
+      total = (item.amount || 0r) + entry.amount
+      item.quantity = total.zero? ? (entry.text || item.quantity) : Quantity.format(total)
+      item.unit ||= entry.unit
       item.save!
+      entry.sources.each do |source|
+        item.sources.create!(recipe: source.recipe, recipe_name: source.recipe.name, planned_on: source.planned_on,
+                             quantity: (Quantity.format(source.amount) if source.amount) || source.text, unit: source.unit)
+      end
     end
 end
