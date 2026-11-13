@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   resources :recipes do
     resources :grocery_items, only: :create, module: :recipes
     resource :like, only: %i[create destroy]
+    resource :cooking, only: %i[create destroy] # "I cooked this" and its undo
     resource :rating, only: %i[update destroy]
     resource :copy, only: :create
     resources :comments, only: %i[create destroy]

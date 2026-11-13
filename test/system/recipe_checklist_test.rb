@@ -59,4 +59,18 @@ class RecipeChecklistSystemTest < ApplicationSystemTestCase
     assert_no_link "Cook"
     assert_raises(ActionController::RoutingError) { Rails.application.routes.recognize_path("/recipes/#{@recipe.id}/cook") }
   end
+
+  test "the I cooked this button at the end of the steps logs it, shows when, and can be undone" do
+    click_button "I cooked this"
+    assert_text "Logged! That's the first time you've cooked Toast."
+    assert_text "Cooked today at"
+    assert_text "Cooked 1 time · last today"
+    assert_no_button "I cooked this"
+    assert_equal 1, @cook.cookings.count
+
+    click_button "Undo"
+    assert_button "I cooked this"
+    assert_no_text "Cooked today at"
+    assert_equal 0, @cook.cookings.count
+  end
 end

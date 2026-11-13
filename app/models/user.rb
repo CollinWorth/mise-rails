@@ -7,6 +7,7 @@ class User < ApplicationRecord
   has_many :ratings, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :planned_meals, dependent: :destroy
+  has_many :cookings, dependent: :destroy
   has_one :grocery_list, dependent: :destroy
 
   has_many :follows, foreign_key: :follower_id, dependent: :destroy

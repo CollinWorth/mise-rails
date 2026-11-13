@@ -7,6 +7,7 @@ class Recipe < ApplicationRecord
   has_many :ratings, dependent: :destroy
   has_many :comments, -> { order(:created_at) }, dependent: :destroy
   has_many :planned_meals, dependent: :destroy
+  has_many :cookings, dependent: :nullify
   has_many :grocery_item_sources, dependent: :nullify
   has_one_attached :image do |attachable|
     # Small WebP versions, made right after upload (and by `bin/rails images:variants` for existing photos) so no one waits on the first view.

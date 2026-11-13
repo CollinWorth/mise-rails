@@ -21,6 +21,7 @@ class Views::Recipes::Show < Views::Base
           Button(type: :button, variant: :ghost, size: :sm, class: "text-muted-foreground", data: { action: "checklist#clear" }) { "Clear ticks" }
         end
         Steps(steps: @recipe.steps)
+        cooked_button
       end
     end
     versions
@@ -39,6 +40,7 @@ class Views::Recipes::Show < Views::Base
         end
         Heading(level: 1) { @recipe.name }
         facts
+        cooked_summary
         TextLink(href: @recipe.source_url, target: "_blank", rel: "noopener noreferrer", class: "text-sm") { "Source: #{@recipe.source_host}" } if @recipe.source_host
       end
     end
@@ -52,6 +54,47 @@ class Views::Recipes::Show < Views::Base
         Tag(tone: :tertiary) { @recipe.cuisine } if @recipe.cuisine.present?
         Tag(tone: :tertiary) { @recipe.category } if @recipe.category.present?
         Tag(tone: :tertiary) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
+      end
+    end
+
+    # What this cook has done with the recipe so far, e.g. "Cooked 3 times · last yesterday".
+    def cooked_summary
+      return unless latest_cooking
+
+      Text(size: "2", class: "text-muted-foreground") { "Cooked #{cooked_count} #{'time'.pluralize(cooked_count)} · last #{day_words(latest_cooking.cooked_at)}" }
+    end
+
+    # The log button at the end of the steps; once pressed it turns into a confirmation with an undo.
+    def cooked_button
+      return unless Current.user
+
+      if latest_cooking&.cooked_at&.to_date == Date.current
+        Row(justify: :between, class: "rounded-xl border bg-brand-2/10 p-3") do
+          Row(gap: :sm) do
+            Icon(:check, class: "size-5 text-brand-2")
+            Text(weight: "medium") { "Cooked today at #{latest_cooking.cooked_at.strftime('%-l:%M %P')}" }
+          end
+          ButtonTo(action: recipe_cooking_path(@recipe), method: :delete, variant: :ghost) { "Undo" } if latest_cooking.undoable?
+        end
+      else
+        ButtonTo(action: recipe_cooking_path(@recipe), variant: :primary, size: :lg) { "I cooked this" }
+      end
+    end
+
+    def latest_cooking
+      return unless Current.user
+
+      @latest_cooking = Current.user.cookings.where(recipe: @recipe).newest.first unless defined?(@latest_cooking)
+      @latest_cooking
+    end
+
+    def cooked_count = Current.user.cookings.where(recipe: @recipe).count
+
+    def day_words(time)
+      case time.to_date
+      when Date.current then "today"
+      when Date.current - 1 then "yesterday"
+      else "on #{time.strftime('%b %-d')}"
       end
     end
 
