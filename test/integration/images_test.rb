@@ -2,6 +2,8 @@ require "test_helper"
 require "rake"
 
 class ImagesTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   test "recipe photos are served directly and cached, not through expiring redirects" do
     recipe = attach_image create_recipe(create_user(name: "Maria"), name: "Toast")
 
@@ -46,6 +48,14 @@ class ImagesTest < ActionDispatch::IntegrationTest
       prepared = recipe.image.variant(name).variation
       asked_for = ActiveStorage::Variation.decode(prepared.key)
       assert_equal prepared.digest, asked_for.digest, "#{name} would be processed again on the first view"
+    end
+  end
+
+  test "a newly attached photo gets its card and hero versions prepared right away" do
+    recipe = create_recipe(create_user(name: "Maria"), name: "Toast")
+
+    assert_enqueued_jobs 2, only: ActiveStorage::TransformJob do
+      attach_image(recipe)
     end
   end
 end
