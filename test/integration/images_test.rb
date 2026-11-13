@@ -38,4 +38,14 @@ class ImagesTest < ActionDispatch::IntegrationTest
     assert_includes output, "Prepared 2 photos."
     assert_equal 4, ActiveStorage::VariantRecord.count
   end
+
+  test "a prepared version is the same one the photo's URL asks for, so it is found instead of made again" do
+    recipe = attach_image create_recipe(create_user(name: "Maria"), name: "Toast")
+
+    %i[card hero].each do |name|
+      prepared = recipe.image.variant(name).variation
+      asked_for = ActiveStorage::Variation.decode(prepared.key)
+      assert_equal prepared.digest, asked_for.digest, "#{name} would be processed again on the first view"
+    end
+  end
 end
