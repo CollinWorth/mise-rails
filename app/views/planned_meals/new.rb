@@ -29,7 +29,7 @@ class Views::PlannedMeals::New < Views::Base
     def recipes
       return Text { @query.present? ? "No recipes match “#{@query}”." : "You have no recipes yet." } if @recipes.none?
 
-      ActionForm(action: planned_meals_path, data: { turbo_frame: "_top" }) do
+      ActionForm(action: planned_meals_path, top: true) do
         Stack(gap: :sm) do
           input(type: :hidden, name: "planned_meal[date]", value: @date)
           times_field
@@ -39,7 +39,7 @@ class Views::PlannedMeals::New < Views::Base
     end
 
     def days
-      ActionForm(action: planned_meals_path, data: { turbo_frame: "_top" }) do
+      ActionForm(action: planned_meals_path, top: true) do
         Stack(gap: :sm) do
           input(type: :hidden, name: "planned_meal[recipe_id]", value: @recipe.id)
           times_field

@@ -19,6 +19,9 @@ class ActiveSupport::TestCase
 end
 
 class ActionDispatch::IntegrationTest
+  # Request headers of a sheet opened from a link (it loads into the `modal` Turbo Frame).
+  def modal_headers = { "Turbo-Frame" => "modal" }
+
   def sign_in(user)
     post session_path, params: { email_address: user.email_address, password: "secret123" }
   end

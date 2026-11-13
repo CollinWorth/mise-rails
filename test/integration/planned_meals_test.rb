@@ -1,8 +1,6 @@
 require "test_helper"
 
 class PlannedMealsTest < ActionDispatch::IntegrationTest
-  FRAME = { "Turbo-Frame" => "modal" }.freeze
-
   setup do
     @cook = create_user(name: "Maria")
     @soup = create_recipe(@cook, name: "Soup")
@@ -17,19 +15,19 @@ class PlannedMealsTest < ActionDispatch::IntegrationTest
   end
 
   test "picking a recipe for a day lists your recipes and searches them" do
-    get new_planned_meal_path(date: "2026-11-14"), headers: FRAME
+    get new_planned_meal_path(date: "2026-11-14"), headers: modal_headers
     assert_response :success
     assert_select "turbo-frame#modal"
     assert_select "button[name='planned_meal[recipe_id]']", count: 2
     assert_select "input[name='planned_meal[date]'][value='2026-11-14']"
     assert_no_match(/Not Mine/, response.body)
 
-    get new_planned_meal_path(date: "2026-11-14", q: "greek"), headers: FRAME
+    get new_planned_meal_path(date: "2026-11-14", q: "greek"), headers: modal_headers
     assert_select "button[name='planned_meal[recipe_id]']", count: 1, text: "Greek Salad"
   end
 
   test "picking a day for a recipe lists the next two weeks" do
-    get new_planned_meal_path(recipe_id: @soup.id), headers: FRAME
+    get new_planned_meal_path(recipe_id: @soup.id), headers: modal_headers
     assert_response :success
     assert_select "button[name='planned_meal[date]']", count: Views::PlannedMeals::New::DAYS_AHEAD
     assert_select "button[name='planned_meal[date]']", text: /Today/

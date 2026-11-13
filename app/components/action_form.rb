@@ -3,11 +3,12 @@
 class Components::ActionForm < Components::Base
   include Phlex::Rails::Helpers::FormAuthenticityToken
 
-  def initialize(action:, method: :post, multipart: false, **attrs)
+  def initialize(action:, method: :post, multipart: false, top: false, **attrs)
     @action = action
     @method = method.to_sym
     @attrs = attrs
     @attrs[:enctype] = "multipart/form-data" if multipart
+    @attrs[:data] = (@attrs[:data] || {}).merge(turbo_frame: "_top") if top # forms inside a sheet navigate the whole page
   end
 
   def view_template(&)

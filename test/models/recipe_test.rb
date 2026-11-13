@@ -72,13 +72,6 @@ class RecipeTest < ActiveSupport::TestCase
     assert_nil @recipe.rating_by(@author)
   end
 
-  test "scale_key falls back to 1 for anything unknown" do
-    assert_equal "2", Recipe.scale_key("2")
-    assert_equal "0.5", Recipe.scale_key("0.5")
-    assert_equal "1", Recipe.scale_key("7")
-    assert_equal "1", Recipe.scale_key(nil)
-  end
-
   test "source link must be an http or https address" do
     %w[https://example.com/pie http://example.com].each do |url|
       assert @recipe.tap { |r| r.source_url = url }.valid?, url

@@ -59,10 +59,8 @@ class Views::GroceryLists::Show < Views::Base
           input(type: :hidden, name: "item[checked]", value: item.checked? ? "0" : "1")
           Button(type: :submit, variant: item.checked? ? :secondary : :outline, size: :md) { item.checked? ? "☑" : "☐" }
         end
-        Link(href: edit_grocery_list_item_path(item), variant: :ghost, data: { turbo_frame: "modal" },
-             class: [ "h-auto justify-start whitespace-normal px-2 py-2 text-left", ("line-through text-muted-foreground" if item.checked?) ]) do
-          [ item.quantity, item.unit, item.name ].compact_blank.join(" ")
-        end
+        SheetLink(href: edit_grocery_list_item_path(item), variant: :ghost,
+                  class: [ "h-auto justify-start whitespace-normal px-2 py-2 text-left", ("line-through text-muted-foreground" if item.checked?) ]) { item.to_line }
       end
     end
 end

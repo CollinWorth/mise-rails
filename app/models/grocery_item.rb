@@ -2,14 +2,14 @@ class GroceryItem < ApplicationRecord
   # Aisle order and keywords live in config/grocery_categories.yml
   CATEGORIES = YAML.load_file(Rails.root.join("config/grocery_categories.yml")).freeze
 
+  include Quantified
+
   belongs_to :grocery_list
 
   validates :name, presence: true
   validates :category, inclusion: { in: CATEGORIES.keys }
 
   before_validation :guess_category, if: :guess_category?
-
-  def amount = Quantity.parse(quantity)
 
   # The longest keyword found as a whole word in the name wins, so "tomato paste" beats "tomato".
   def self.categorize(name)

@@ -7,14 +7,7 @@ class PlannedMealsController < ApplicationController
 
   # The add-a-meal sheet, loaded into the layout's `modal` Turbo Frame.
   def new
-    return redirect_to planned_meals_path(date: params[:date]) unless turbo_frame_request?
-
-    if params[:recipe_id].present?
-      render Views::PlannedMeals::New.new(recipe: Recipe.visible_to(Current.user).find(params[:recipe_id]))
-    else
-      recipes = Current.user.recipes.search(params[:q]).order(:name).limit(30)
-      render Views::PlannedMeals::New.new(date: requested_date || Date.current, recipes:, query: params[:q].to_s)
-    end
+    render_sheet(fallback: planned_meals_path(date: params[:date])) { new_meal_sheet }
   end
 
   def create
@@ -31,6 +24,16 @@ class PlannedMealsController < ApplicationController
   end
 
   private
+    # With a recipe, pick a day for it; otherwise pick a recipe for the day.
+    def new_meal_sheet
+      if params[:recipe_id].present?
+        Views::PlannedMeals::New.new(recipe: Recipe.visible_to(Current.user).find(params[:recipe_id]))
+      else
+        recipes = Current.user.recipes.search(params[:q]).order(:name).limit(30)
+        Views::PlannedMeals::New.new(date: requested_date || Date.current, recipes:, query: params[:q].to_s)
+      end
+    end
+
     def requested_date
       Date.iso8601(params[:date]) if params[:date].present?
     rescue Date::Error

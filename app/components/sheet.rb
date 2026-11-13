@@ -1,6 +1,7 @@
 # A full-screen sheet that slides up over the page. It renders into the layout's
-# `modal` Turbo Frame, so open it with a link that has `data: { turbo_frame: "modal" }`.
-# The sheet controller handles closing and the slide-down after a form is submitted.
+# `modal` Turbo Frame, so open it with a SheetLink, and give forms inside it `top: true`
+# so submitting them updates the page behind. The sheet controller handles closing and
+# the slide-down after a form is submitted.
 class Components::Sheet < Components::Base
   def initialize(title:)
     @title = title

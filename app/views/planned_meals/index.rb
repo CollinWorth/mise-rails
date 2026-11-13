@@ -32,7 +32,7 @@ class Views::PlannedMeals::Index < Views::Base
                 ButtonTo(action: planned_meal_path(meal), method: :delete, variant: :ghost) { "Remove" }
               end
             end
-            Link(href: new_planned_meal_path(date:), variant: :outline, size: :sm, data: { turbo_frame: "modal" }) { "+ Add" }
+            SheetLink(href: new_planned_meal_path(date:), variant: :outline, size: :sm) { "+ Add" }
           end
         end
       end

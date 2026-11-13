@@ -6,7 +6,7 @@ class Views::GroceryLists::Items::Edit < Views::Base
   def view_template
     Sheet(title: "Edit item") do
       Stack do
-        ActionForm(action: grocery_list_item_path(@item), method: :patch, data: { turbo_frame: "_top" }) do
+        ActionForm(action: grocery_list_item_path(@item), method: :patch, top: true) do
           Stack do
             Field(label: "Item", name: "item[name]", id: "item_name", value: @item.name, required: true)
             Row do
@@ -16,7 +16,7 @@ class Views::GroceryLists::Items::Edit < Views::Base
             Button(type: :submit) { "Save" }
           end
         end
-        ButtonTo(action: grocery_list_item_path(@item), method: :delete, variant: :destructive, size: :md, data: { turbo_frame: "_top" }) { "Delete item" }
+        ButtonTo(action: grocery_list_item_path(@item), method: :delete, variant: :destructive, size: :md, top: true) { "Delete item" }
       end
     end
   end

@@ -3,8 +3,7 @@ class Recipes::GroceryItemsController < ApplicationController
   include RecipeScoped
 
   def create
-    factor = Recipe::SCALES.fetch(Recipe.scale_key(params[:scale]))
-    count = Current.user.grocery_list.add_recipes([ [ @recipe, factor ] ])
+    count = Current.user.grocery_list.add_recipes([ [ @recipe, Scale.pick(params[:scale]).factor ] ])
     redirect_back_or_to @recipe, notice: "Added #{count} ingredients to your grocery list.", status: :see_other
   end
 end

@@ -61,7 +61,7 @@ class GroceryListsTest < ActionDispatch::IntegrationTest
     get edit_grocery_list_item_path(item)
     assert_redirected_to grocery_list_path
 
-    get edit_grocery_list_item_path(item), headers: { "Turbo-Frame" => "modal" }
+    get edit_grocery_list_item_path(item), headers: modal_headers
     assert_response :success
     assert_select "turbo-frame#modal input[name='item[name]'][value=bananas]"
   end

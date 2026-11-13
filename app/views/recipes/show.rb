@@ -1,10 +1,7 @@
 class Views::Recipes::Show < Views::Base
-  SCALE_LABELS = { "0.5" => "½×", "1" => "1×", "2" => "2×", "3" => "3×" }.freeze
-
-  def initialize(recipe:, scale: "1")
+  def initialize(recipe:, scale: Scale.default)
     @recipe = recipe
     @scale = scale
-    @factor = Recipe::SCALES.fetch(scale)
   end
 
   def view_template
@@ -13,7 +10,7 @@ class Views::Recipes::Show < Views::Base
       Link(href: user_path(@recipe.user)) { "by #{@recipe.user.name}" }
       Badge(variant: :outline) { "Prep #{@recipe.prep_time} min" } if @recipe.prep_time
       Badge(variant: :outline) { "Cook #{@recipe.cook_time} min" } if @recipe.cook_time
-      Badge(variant: :outline) { "Serves #{Quantity.format(@recipe.servings * @factor)}" } if @recipe.servings
+      Badge(variant: :outline) { "Serves #{Quantity.format(@recipe.servings * @scale.factor)}" } if @recipe.servings
       Badge(variant: :outline) { @recipe.cuisine } if @recipe.cuisine.present?
       Badge(variant: :outline) { @recipe.category } if @recipe.category.present?
       Badge(variant: :outline) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
@@ -32,10 +29,10 @@ class Views::Recipes::Show < Views::Base
     def owner? = Current.user == @recipe.user
 
     def actions
-      Link(href: recipe_cook_path(@recipe, scale: @scale), variant: :primary) { "Cook" }
+      Link(href: recipe_cook_path(@recipe, scale: @scale.to_param), variant: :primary) { "Cook" }
       if Current.user
-        Link(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :outline, data: { turbo_frame: "modal" }) { "Add to plan" }
-        ButtonTo(action: recipe_grocery_items_path(@recipe), params: { scale: @scale }, size: :md) { "Add to grocery list" }
+        SheetLink(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :outline) { "Add to plan" }
+        ButtonTo(action: recipe_grocery_items_path(@recipe), params: { scale: @scale.key }, size: :md) { "Add to grocery list" }
       end
       if @recipe.public?
         Button(type: :button, variant: :outline, size: :md, hidden: true,
@@ -63,7 +60,7 @@ class Views::Recipes::Show < Views::Base
               if ingredient.section?
                 Heading(level: 4) { ingredient.name }
               else
-                Text { ingredient.to_line(@factor) }
+                Text { ingredient.to_line(@scale.factor) }
               end
             end
           end
@@ -73,8 +70,8 @@ class Views::Recipes::Show < Views::Base
 
     def scale_links
       Row(gap: :sm) do
-        SCALE_LABELS.each do |key, label|
-          Link(href: recipe_path(@recipe, scale: (key unless key == "1")), variant: key == @scale ? :secondary : :ghost, size: :sm) { label }
+        Scale::ALL.each do |scale|
+          Link(href: recipe_path(@recipe, scale: scale.to_param), variant: scale == @scale ? :secondary : :ghost, size: :sm) { scale.label }
         end
       end
     end

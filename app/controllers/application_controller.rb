@@ -9,4 +9,11 @@ class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordInvalid do |error|
     redirect_back_or_to root_path, alert: error.record.errors.full_messages.to_sentence, status: :see_other
   end
+
+  private
+    # Sheets (see Components::Sheet) load into the layout's `modal` Turbo Frame.
+    # Opened any other way, they send you to the page they belong over instead.
+    def render_sheet(fallback:)
+      turbo_frame_request? ? render(yield) : redirect_to(fallback)
+    end
 end

@@ -1,8 +1,8 @@
 # Cook mode: just the steps, one at a time, with the ingredients alongside.
 class Views::Cooks::Show < Views::Base
-  def initialize(recipe:, scale: "1")
+  def initialize(recipe:, scale: Scale.default)
     @recipe = recipe
-    @factor = Recipe::SCALES.fetch(scale)
+    @scale = scale
   end
 
   def view_template
@@ -24,7 +24,7 @@ class Views::Cooks::Show < Views::Base
             @recipe.ingredients.reject(&:section?).each do |ingredient|
               Row(gap: :sm) do
                 Checkbox(id: "ingredient_#{ingredient.id}")
-                FormFieldLabel(for: "ingredient_#{ingredient.id}") { ingredient.to_line(@factor) }
+                FormFieldLabel(for: "ingredient_#{ingredient.id}") { ingredient.to_line(@scale.factor) }
               end
             end
           end

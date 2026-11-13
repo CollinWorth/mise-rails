@@ -20,11 +20,6 @@ class Recipe < ApplicationRecord
   # Set by the edit form's "Remove photo" checkbox.
   attr_accessor :remove_image
 
-  # Quantities can be shown at these multiples; the keys are what goes in the ?scale= parameter.
-  SCALES = { "0.5" => 1 / 2r, "1" => 1r, "2" => 2r, "3" => 3r }.freeze
-
-  def self.scale_key(param) = SCALES.key?(param.to_s) ? param.to_s : "1"
-
   ACCEPTED_IMAGE_TYPES = %w[image/jpeg image/png image/webp image/gif].freeze
   MAX_IMAGE_SIZE = 10.megabytes
 
