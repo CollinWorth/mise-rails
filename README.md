@@ -20,6 +20,7 @@ SQLite for development and tests, Postgres and an S3-compatible bucket in produc
 
     bin/d bin/rails test                  # models, integration, and the structure guards in test/components
     bin/d bin/rails test:system           # browser tests in phone-sized headless Chromium (some switch to desktop width)
+                                          # test/system/journeys/ holds the start-to-finish stories (new cook, sharing, desktop)
     COVERAGE=1 bin/d bin/rails test       # also writes coverage/ (run test:system with COVERAGE=1 too; results merge)
     bin/d bin/rubocop && bin/d bin/brakeman -q --no-pager && bin/d bin/bundler-audit && bin/d bin/importmap audit
 

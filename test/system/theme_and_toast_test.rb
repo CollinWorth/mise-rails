@@ -75,4 +75,18 @@ class ThemeAndToastSystemTest < ApplicationSystemTestCase
     assert_text "Recipe saved."
     assert_no_text "Recipe saved.", wait: 6
   end
+
+  test "on a phone a toast never covers the account button at the top" do
+    sign_in_through_form(create_user(name: "Maria"))
+    visit new_recipe_path
+    fill_in "Name", with: "Toast"
+    click_button "Save recipe"
+    assert_text "Recipe saved."
+
+    toast = find("[data-controller~=toast]").native.rect
+    account = find("button[aria-label='Account menu']").native.rect
+    assert_operator toast.y, :>, account.y + account.height, "the toast sits below the account button"
+    click_button "Account menu" # still tappable while the toast shows
+    assert_button "Sign out"
+  end
 end
