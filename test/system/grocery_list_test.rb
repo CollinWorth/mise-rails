@@ -21,6 +21,24 @@ class GroceryListSystemTest < ApplicationSystemTestCase
     assert_no_text "Checked"
   end
 
+  test "clearing the list takes the menu, then a confirmation; keeping the list changes nothing" do
+    click_button "More list actions"
+    click_link "Clear list…"
+    assert_sheet_open
+    assert_text "all 2 items"
+
+    click_button "Keep my list"
+    assert_no_selector "[data-controller~=sheet]"
+    assert_equal 2, @cook.grocery_list.items.count
+
+    click_button "More list actions"
+    click_link "Clear list…"
+    click_button "Clear 2 items"
+    assert_text "Your list is empty"
+    assert_text "Cleared 2 items"
+    assert_equal 0, @cook.grocery_list.items.count
+  end
+
   test "tapping an item's name ticks it off" do
     click_button "bananas"
     assert_text "Checked (1)"

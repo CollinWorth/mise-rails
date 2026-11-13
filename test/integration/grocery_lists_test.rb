@@ -76,4 +76,34 @@ class GroceryListsTest < ActionDispatch::IntegrationTest
     assert_operator response.body.index("milk"), :<, response.body.index("Checked (1)")
     assert_operator response.body.index("Checked (1)"), :<, response.body.rindex("bananas")
   end
+
+  test "clearing the whole list asks first, then removes everything, and only yours" do
+    @user.grocery_list.items.create!(name: "bananas", checked: true)
+    @user.grocery_list.items.create!(name: "milk")
+    other = create_user(name: "Other")
+    other.grocery_list.items.create!(name: "kept")
+
+    get grocery_list_path
+    assert_select "a[href=?][data-turbo-frame=modal]", new_grocery_list_clearance_path, text: /Clear list/
+
+    get new_grocery_list_clearance_path
+    assert_redirected_to grocery_list_path
+
+    get new_grocery_list_clearance_path, headers: modal_headers
+    assert_select "turbo-frame#modal"
+    assert_match(/all 2 items \(1 checked, 1 still to get\)/, response.body)
+    assert_select "button[type=submit]", text: "Clear 2 items"
+    assert_equal 2, @user.grocery_list.items.count, "just looking changes nothing"
+
+    post grocery_list_clearance_path
+    assert_redirected_to grocery_list_path
+    assert_match(/Cleared 2 items/, flash[:notice])
+    assert_equal 0, @user.grocery_list.items.count
+    assert_equal 1, other.grocery_list.items.count
+  end
+
+  test "an empty list has nothing to clear" do
+    get grocery_list_path
+    assert_select "a", text: /Clear list/, count: 0
+  end
 end

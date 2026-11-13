@@ -95,10 +95,19 @@ class MealPlanSystemTest < ApplicationSystemTestCase
     assert_selector "nav[aria-label='Days of the week'] a", count: 7
   end
 
-  test "the day strip on a phone jumps to a day" do
+  test "the day strip on a phone scrolls to a day every time, not just the first" do
+    monday = Date.current.beginning_of_week
     visit planned_meals_path
-    find("nav[aria-label='Days of the week'] a[aria-label='#{(Date.current.beginning_of_week + 6).strftime('%A, %B %-d')}']").click
-    assert_current_path(/#day-#{(Date.current.beginning_of_week + 6).iso8601}/, url: true)
+    below_strip = lambda do |date|
+      page.evaluate_script("document.getElementById('day-#{date.iso8601}').getBoundingClientRect().top - document.querySelector('nav[aria-label=\"Days of the week\"]').getBoundingClientRect().bottom")
+    end
+
+    [ monday, monday + 2, monday ].each do |date|
+      find("nav[aria-label='Days of the week'] a[href='#day-#{date.iso8601}']").click
+      assert_selector("#day-#{date.iso8601}", wait: 2) { below_strip.(date).between?(0, 40) }
+      sleep 0.9
+      assert_includes 0..40, below_strip.(date).round, "#{date} should sit just under the strip"
+    end
   end
 
   test "a planned meal can be removed from its day" do

@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     scope module: :grocery_lists do
       resources :items, only: %i[create show edit update destroy]
       resource :checked_items, only: :destroy
+      resource :clearance, only: %i[new create] # emptying the whole list asks first
       resource :meal_plan, only: %i[new create] do
         resources :pantry_items, only: %i[create destroy], module: :meal_plans, constraints: { id: %r{[^/]+} }
       end

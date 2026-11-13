@@ -8,6 +8,7 @@ class Views::GroceryLists::Show < Views::Base
       PageHeader(title: "Grocery list") do
         Link(href: pantry_items_path, variant: :outline) { "Pantry" }
         Link(href: planned_meals_path, variant: :outline) { "Plan meals" }
+        more_menu if @list.items.any?
       end
       add_form
       items = @list.items.includes(:sources).to_a
@@ -22,6 +23,13 @@ class Views::GroceryLists::Show < Views::Base
   end
 
   private
+    # Emptying the list is tucked away here, and still asks for confirmation in a sheet.
+    def more_menu
+      Menu(label: "More list actions", trigger: -> { span(class: "flex size-10 items-center justify-center rounded-full border") { Icon(:ellipsis) } }) do
+        MenuItem(href: new_grocery_list_clearance_path, icon: :trash, data: { turbo_frame: "modal" }) { "Clear list…" }
+      end
+    end
+
     def add_form
       ActionForm(action: grocery_list_items_path) do
         Row(gap: :sm) do
