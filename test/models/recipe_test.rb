@@ -88,4 +88,12 @@ class RecipeTest < ActiveSupport::TestCase
     @recipe.source_url = nil
     assert_nil @recipe.source_host
   end
+
+  test "instructions are stored with plain line breaks and no stray whitespace" do
+    recipe = create_recipe(create_user(name: "Maria"), name: "Toast")
+    recipe.update!(instructions: "  Toast it.\r\nButter it.\r\n  ")
+
+    assert_equal "Toast it.\nButter it.", recipe.reload.instructions
+    assert_equal [ "Toast it.", "Butter it." ], recipe.steps
+  end
 end

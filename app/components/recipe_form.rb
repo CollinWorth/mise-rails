@@ -21,7 +21,7 @@ class Components::RecipeForm < Components::Base
         PhotoField(recipe: @recipe)
         ingredients
         field(:source_url, "Source link (optional)", type: :url, inputmode: "url", autocapitalize: "none", autocorrect: "off")
-        TextAreaField(label: "Instructions (one step per line)", name: "recipe[instructions]", value: @recipe.instructions, rows: 10)
+        StepsEditor(recipe: @recipe)
         Row(gap: :sm) do
           input(type: :hidden, name: "recipe[public]", value: "0")
           Checkbox(id: "recipe_public", name: "recipe[public]", value: "1", checked: @recipe.public?)
@@ -46,7 +46,9 @@ class Components::RecipeForm < Components::Base
 
       Stack(gap: :sm, data: { controller: "nested-form" }) do
         Heading(level: 3) { "Ingredients" }
-        div(data: { nested_form_target: "list" }) { rows.each_with_index { |ingredient, index| IngredientFields(ingredient:, index:) } }
+        div(class: "flex flex-col gap-2", data: { nested_form_target: "list", controller: "reorder", action: "reorder:start->nested-form#dragStart reorder:move->nested-form#canDrop reorder:end->nested-form#dragEnd" }) do
+          rows.each_with_index { |ingredient, index| IngredientFields(ingredient:, index:) }
+        end
         template(data: { nested_form_target: "template" }) { IngredientFields(ingredient: Ingredient.new, index: "NEW_RECORD") }
         template(data: { nested_form_target: "sectionTemplate" }) { IngredientFields(ingredient: Ingredient.new(section: true), index: "NEW_RECORD") }
         Row(gap: :sm) do

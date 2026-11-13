@@ -12,10 +12,10 @@ class RecipeFormTest < ApplicationSystemTestCase
     assert_selector "input[placeholder=Ingredient]", count: 2
     all("input[placeholder=Ingredient]").last.set("butter")
     click_button "Add ingredient"
-    click_button "Remove", match: :first
+    click_button "Remove ingredient", match: :first
     assert_selector "input[placeholder=Ingredient]", count: 2
 
-    fill_in "Instructions (one step per line)", with: "Toast it.\nButter it."
+    find("textarea[aria-label=Step]").send_keys("Toast it.", :enter, "Butter it.")
     click_button "Save recipe"
 
     assert_text "Recipe saved."

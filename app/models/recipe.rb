@@ -26,6 +26,9 @@ class Recipe < ApplicationRecord
   ACCEPTED_IMAGE_TYPES = %w[image/jpeg image/png image/webp image/gif].freeze
   MAX_IMAGE_SIZE = 10.megabytes
 
+  # Browsers send line breaks as \r\n; steps are stored one per line with plain \n.
+  normalizes :instructions, with: ->(text) { text.gsub(/\r\n?/, "\n").strip }
+
   validates :name, presence: true
   validate :source_url_is_a_web_address
   validate :image_is_a_photo
