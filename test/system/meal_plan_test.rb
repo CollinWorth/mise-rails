@@ -23,6 +23,18 @@ class MealPlanSystemTest < ApplicationSystemTestCase
     assert_equal Date.current.beginning_of_week, @cook.planned_meals.last.date
   end
 
+  test "long recipe names wrap in the add sheet instead of scrolling it sideways, and there is no times field" do
+    create_recipe(@cook, name: "Slow Roasted Chicken Thighs with Lemon, Garlic, Olives and Crispy Potatoes for a Big Sunday Dinner")
+    visit planned_meals_path
+    first(:link, "+ Add", visible: true).click
+    assert_sheet_open
+
+    assert_no_field "planned_meal[multiplier]"
+    panel = find("[data-sheet-target=panel]")
+    assert_operator page.evaluate_script("document.querySelector('[data-sheet-target=panel] .overflow-y-auto').scrollWidth"), :<=, panel.native.size.width
+    assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, page.evaluate_script("window.innerWidth")
+  end
+
   test "closing the sheet adds nothing" do
     visit planned_meals_path
     first(:link, "+ Add", visible: true).click

@@ -32,7 +32,6 @@ class Views::PlannedMeals::New < Views::Base
       ActionForm(action: planned_meals_path, top: true) do
         Stack(gap: :sm) do
           input(type: :hidden, name: "planned_meal[date]", value: @date)
-          times_field
           @recipes.each { |recipe| choice(recipe.name, name: "planned_meal[recipe_id]", value: recipe.id) }
         end
       end
@@ -42,18 +41,13 @@ class Views::PlannedMeals::New < Views::Base
       ActionForm(action: planned_meals_path, top: true) do
         Stack(gap: :sm) do
           input(type: :hidden, name: "planned_meal[recipe_id]", value: @recipe.id)
-          times_field
           DAYS_AHEAD.times { |offset| choice(day_label(Date.current + offset), name: "planned_meal[date]", value: Date.current + offset) }
         end
       end
     end
 
-    def times_field
-      Field(label: "Times (scales the grocery list)", name: "planned_meal[multiplier]", id: "planned_meal_multiplier", type: :number, value: 1, min: 1, inputmode: "numeric")
-    end
-
     def choice(label, **attrs)
-      Button(type: :submit, variant: :outline, class: "h-auto w-full justify-start py-3 text-left", **attrs) { label }
+      Button(type: :submit, variant: :outline, class: "h-auto min-h-12 w-full justify-start whitespace-normal break-words py-3 text-left", **attrs) { label }
     end
 
     def day_label(date)
