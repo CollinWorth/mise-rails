@@ -1,11 +1,11 @@
-# The "Shop for this week" sheet: pick the meals, then pick the ingredients.
+# The sheet behind the planner's "Add to grocery list" button: pick the meals, then pick the ingredients.
 class Views::GroceryLists::MealPlans::New < Views::Base
   def initialize(trip:)
     @trip = trip
   end
 
   def view_template
-    Sheet(title: "Shop for #{@trip.title}") do
+    Sheet(title: "Groceries for #{@trip.title}") do
       if @trip.meals.none?
         Text { "Nothing is planned this week." }
       else

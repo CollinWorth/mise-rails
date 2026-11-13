@@ -9,7 +9,7 @@ class Views::PlannedMeals::Index < Views::Base
       Link(href: planned_meals_path(date: @week_start - 7), variant: :outline) { "← Previous" }
       Link(href: planned_meals_path(date: Date.current), variant: :outline) { "Today" }
       Link(href: planned_meals_path(date: @week_start + 7), variant: :outline) { "Next →" }
-      SheetLink(href: new_grocery_list_meal_plan_path(date: @week_start), variant: :primary) { "Shop for this week" }
+      SheetLink(href: new_grocery_list_meal_plan_path(date: @week_start), variant: :primary) { "Add to grocery list" }
     end
     Grid(columns: 7) { (0..6).each { |offset| day(@week_start + offset) } }
   end

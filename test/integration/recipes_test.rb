@@ -71,7 +71,7 @@ class RecipesTest < ActionDispatch::IntegrationTest
     assert_no_difference "Recipe.count" do
       post recipes_import_path, params: { text: "Tacos\nIngredients\n2 cups masa\nMethod\nMix" }
     end
-    assert_response :success
+    assert_response :unprocessable_content, "Turbo needs a redirect or an error status after a form post"
     assert_match "masa", response.body
   end
 
@@ -80,5 +80,6 @@ class RecipesTest < ActionDispatch::IntegrationTest
 
     post recipes_import_path, params: { url: "http://127.0.0.1/admin" }
     assert_redirected_to new_recipes_import_path
+    assert_response :see_other
   end
 end

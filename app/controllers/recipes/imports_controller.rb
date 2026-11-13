@@ -7,8 +7,10 @@ class Recipes::ImportsController < ApplicationController
 
   def create
     recipe = Current.user.recipes.build(RecipeImport.new(params.permit(:url, :text)).attributes)
-    render Views::Recipes::New.new(recipe:)
+    # Turbo only accepts a redirect or an error status in answer to a form post. The draft isn't saved yet, so it is
+    # shown the way an invalid form is: re-rendered with 422.
+    render Views::Recipes::New.new(recipe:), status: :unprocessable_content
   rescue RecipeImport::Failed => error
-    redirect_to new_recipes_import_path, alert: error.message
+    redirect_to new_recipes_import_path, alert: error.message, status: :see_other
   end
 end

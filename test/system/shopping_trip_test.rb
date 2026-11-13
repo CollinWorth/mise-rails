@@ -14,19 +14,19 @@ class ShoppingTripTest < ApplicationSystemTestCase
 
   def open_review
     visit planned_meals_path
-    click_link "Shop for this week"
+    click_link "Add to grocery list"
     assert_sheet_open
   end
 
   test "review the week, mark one thing as always had, skip another, and add the rest" do
     open_review
     assert_text(/tomato\s+5/)
-    assert_selector "span", text: "in pantry", count: 1
+    assert_text "In your pantry", count: 1
     assert_unchecked_field "salt 1 tsp"
 
-    click_button "Always have", match: :first # tomato, the first row
+    click_button "Add to pantry", match: :first # tomato, the first row
     assert_selector "[data-controller~=sheet]" # the sheet stays open
-    assert_selector "span", text: "in pantry", count: 2
+    assert_text "In your pantry", count: 2
     assert_unchecked_field "tomato 5"
     assert_checked_field "leek 1"
 
@@ -37,6 +37,18 @@ class ShoppingTripTest < ApplicationSystemTestCase
     assert_text "Added 1 item."
     assert_equal [ "carrot" ], @cook.grocery_list.items.reload.map(&:name)
     assert_includes @cook.pantry_keys, "tomato"
+  end
+
+  test "an ingredient already in the pantry can be taken out again from the review" do
+    open_review
+    assert_unchecked_field "salt 1 tsp"
+
+    click_button "Remove from pantry"
+    assert_selector "[data-controller~=sheet]" # the sheet stays open
+    assert_no_text "In your pantry"
+    assert_no_button "Remove from pantry"
+    assert_checked_field "salt 1 tsp" # it needs buying again
+    assert_empty @cook.pantry_keys
   end
 
   test "unticking a meal redraws the ingredients for the others" do

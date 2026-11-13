@@ -1,5 +1,5 @@
-# The ingredient checklist of the "Shop for this week" sheet. Pantry items start unticked.
-# "Always have" adds a line to the pantry and redraws this frame in place (see MealPlans::PantryItemsController).
+# The ingredient checklist of the planner's "Add to grocery list" sheet. Pantry items start unticked.
+# "Add to pantry" / "Remove from pantry" change the pantry and redraw this frame in place (see MealPlans::PantryItemsController).
 class Components::ShoppingReview < Components::Base
   # ticked: the keys to show ticked, or nil for the defaults (everything not in the pantry).
   def initialize(trip:, ticked: nil)
@@ -35,14 +35,22 @@ class Components::ShoppingReview < Components::Base
             plain " "
             span(class: "shrink-0 font-normal text-muted-foreground") { line.amount_text }
           end
-          p(class: "truncate text-xs leading-snug text-muted-foreground", title: "from #{line.recipe_names.to_sentence}") { "from #{line.recipe_names.to_sentence}" }
+          p(class: "truncate text-xs leading-snug text-muted-foreground", title: source_text(line)) { source_text(line) }
         end
-        if line.in_pantry
-          Badge(variant: :outline, class: "shrink-0") { "in pantry" }
-        else
-          Button(type: :submit, variant: :ghost, size: :sm, class: "shrink-0 whitespace-nowrap", formaction: grocery_list_meal_plan_pantry_items_path, name: "pantry_key", value: line.key,
-                 data: { keep_open: true }) { "Always have" }
-        end
+        pantry_button(line)
+      end
+    end
+
+    def source_text(line) = [ ("In your pantry" if line.in_pantry), "from #{line.recipe_names.to_sentence}" ].compact.join(" · ")
+
+    # Adds the ingredient to the pantry, or, if it is there already, takes it out again. Both redraw this frame in place.
+    def pantry_button(line)
+      if line.in_pantry
+        Button(type: :submit, variant: :ghost, size: :sm, class: "shrink-0 whitespace-nowrap text-xs", formaction: grocery_list_meal_plan_pantry_item_path(line.key), formmethod: "delete",
+               aria: { label: "Remove #{line.name} from pantry" }, data: { keep_open: true }) { "Remove from pantry" }
+      else
+        Button(type: :submit, variant: :ghost, size: :sm, class: "shrink-0 whitespace-nowrap text-xs", formaction: grocery_list_meal_plan_pantry_items_path, name: "pantry_key", value: line.key,
+               aria: { label: "Add #{line.name} to pantry" }, data: { keep_open: true }) { "Add to pantry" }
       end
     end
 

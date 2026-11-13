@@ -23,4 +23,17 @@ class SignInTest < ApplicationSystemTestCase
     assert_current_path new_session_path
     assert_text "Try another email address or password"
   end
+
+  test "the account page's buttons fit their labels instead of stretching across the page" do
+    sign_in_through_form(create_user(name: "Maria"))
+
+    on_desktop do
+      visit profile_path
+      [ "Save", "Update password", "Sign out", "Delete account" ].each do |label|
+        width = find_button(label, match: :first).native.size.width
+        assert_operator width, :<, 200, "#{label} is #{width}px wide"
+      end
+      assert_operator find("h1").find(:xpath, "..").native.size.width, :<=, 700, "the page is a narrow column"
+    end
+  end
 end

@@ -36,7 +36,7 @@ Rails.application.routes.draw do
       resources :items, only: %i[create show edit update destroy]
       resource :checked_items, only: :destroy
       resource :meal_plan, only: %i[new create] do
-        resources :pantry_items, only: :create, module: :meal_plans
+        resources :pantry_items, only: %i[create destroy], module: :meal_plans, constraints: { id: %r{[^/]+} }
       end
     end
   end

@@ -25,10 +25,11 @@ class ShoppingTripFlowTest < ActionDispatch::IntegrationTest
     assert_select "input[name='ingredient_keys[]'][value=tomato][checked]"
     assert_select "input[name='ingredient_keys[]'][value=leek][checked]"
     assert_select "input[name='ingredient_keys[]'][value='salt|volume']:not([checked])"
-    assert_select "span", text: "in pantry"
+    assert_select "p", text: /In your pantry · from/
     assert_select "label", text: "tomato 5"
-    assert_select "button[name=pantry_key][value=tomato]", text: "Always have"
+    assert_select "button[name=pantry_key][value=tomato]", text: "Add to pantry"
     assert_select "button[name=pantry_key][value='salt|volume']", count: 0
+    assert_select "button[formmethod=delete]", text: "Remove from pantry", count: 1
   end
 
   test "picking fewer meals redraws the ingredients for just those" do
@@ -63,7 +64,7 @@ class ShoppingTripFlowTest < ActionDispatch::IntegrationTest
     assert_equal %w[leek tomato], @cook.grocery_list.items.map(&:name).sort
   end
 
-  test "Always have adds the pantry item and redraws the review with it unticked" do
+  test "Add to pantry adds the pantry item and redraws the review with it unticked" do
     post grocery_list_meal_plan_pantry_items_path,
          params: { date: @monday, meal_ids: [ "", @salad_meal.id, @soup_meal.id ], ingredient_keys: [ "", "tomato", "leek" ], pantry_key: "tomato" },
          as: :turbo_stream
@@ -74,10 +75,32 @@ class ShoppingTripFlowTest < ActionDispatch::IntegrationTest
     assert_select "turbo-stream[action=replace][target=shop-ingredients]"
     assert_select "input[name='ingredient_keys[]'][value=leek][checked]"
     assert_select "input[name='ingredient_keys[]'][value=tomato]:not([checked])"
-    assert_select "span", text: "in pantry", count: 2
+    assert_select "p", text: /In your pantry/, count: 2
+    assert_select "button[formmethod=delete]", count: 2
   end
 
-  test "Always have refuses a key that isn't on the trip" do
+  test "Remove from pantry takes it out and ticks it again" do
+    delete grocery_list_meal_plan_pantry_item_path("salt|volume"),
+           params: { date: @monday, meal_ids: [ "", @salad_meal.id, @soup_meal.id ], ingredient_keys: [ "", "leek" ] },
+           as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.media_type, "turbo-stream"
+    assert_empty @cook.pantry_keys
+    assert_select "input[name='ingredient_keys[]'][value='salt|volume'][checked]"
+    assert_select "input[name='ingredient_keys[]'][value=leek][checked]", message: "other ticks are kept"
+    assert_select "button[formmethod=delete]", count: 0
+    assert_select "button[name=pantry_key][value='salt|volume']", text: "Add to pantry"
+  end
+
+  test "Remove from pantry refuses a key that isn't on the trip, and leaves the pantry alone" do
+    delete grocery_list_meal_plan_pantry_item_path("caviar"), params: { date: @monday }, as: :turbo_stream
+
+    assert_response :not_found
+    assert_equal [ "salt" ], @cook.pantry_keys
+  end
+
+  test "Add to pantry refuses a key that isn't on the trip" do
     post grocery_list_meal_plan_pantry_items_path, params: { date: @monday, pantry_key: "caviar" }, as: :turbo_stream
     assert_response :not_found
     assert_not_includes @cook.pantry_keys, "caviar"
