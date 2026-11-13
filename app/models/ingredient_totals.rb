@@ -11,9 +11,10 @@ class IngredientTotals
     def text = sources.filter_map(&:text).first
     def recipe_names = sources.map { |source| source.recipe.name }.uniq
 
-    def to_line
-      [ (amount.zero? ? text : Quantity.format(amount)), unit, name ].compact_blank.join(" ")
-    end
+    # "2 tbsp", or the recipes' own wording ("a pinch") when there is nothing to add up
+    def amount_text = [ (amount.zero? ? text : Quantity.format(amount)), unit ].compact_blank.join(" ")
+
+    def to_line = [ amount_text, name ].compact_blank.join(" ")
 
     private
       def total

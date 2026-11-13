@@ -27,18 +27,20 @@ class Components::ShoppingReview < Components::Base
   private
     def row(line)
       id = "ingredient_#{line.key.parameterize}"
-      Row(gap: :sm, justify: :between) do
-        Row(gap: :sm) do
-          Checkbox(id:, name: "ingredient_keys[]", value: line.key, checked: ticked?(line))
-          div do
-            FormFieldLabel(for: id) { line.text }
-            Text(class: "text-xs text-muted-foreground") { "from #{line.recipe_names.to_sentence}" }
+      Row(gap: :sm, class: "flex-nowrap") do
+        Checkbox(id:, name: "ingredient_keys[]", value: line.key, checked: ticked?(line))
+        div(class: "min-w-0 flex-1") do
+          FormFieldLabel(for: id, class: "flex cursor-pointer justify-between gap-3 leading-snug") do
+            span(class: "truncate") { line.name }
+            plain " "
+            span(class: "shrink-0 font-normal text-muted-foreground") { line.amount_text }
           end
+          p(class: "truncate text-xs leading-snug text-muted-foreground", title: "from #{line.recipe_names.to_sentence}") { "from #{line.recipe_names.to_sentence}" }
         end
         if line.in_pantry
-          Badge(variant: :outline) { "in pantry" }
+          Badge(variant: :outline, class: "shrink-0") { "in pantry" }
         else
-          Button(type: :submit, variant: :ghost, size: :sm, formaction: grocery_list_meal_plan_pantry_items_path, name: "pantry_key", value: line.key,
+          Button(type: :submit, variant: :ghost, size: :sm, class: "shrink-0 whitespace-nowrap", formaction: grocery_list_meal_plan_pantry_items_path, name: "pantry_key", value: line.key,
                  data: { keep_open: true }) { "Always have" }
         end
       end

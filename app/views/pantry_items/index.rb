@@ -5,11 +5,13 @@ class Views::PantryItems::Index < Views::Base
   end
 
   def view_template
-    PageHeader(title: "Pantry") { Link(href: grocery_list_path, variant: :outline) { "Grocery list" } }
-    Text { "Things you always have. They're left off your grocery list when you add a recipe or a week of meals." }
-    add_form
-    suggestions if @suggestions.any?
-    list
+    Narrow do
+      PageHeader(title: "Pantry") { Link(href: grocery_list_path, variant: :outline) { "Grocery list" } }
+      Text { "Things you always have. They're left off your grocery list when you add a recipe or a week of meals." }
+      add_form
+      suggestions if @suggestions.any?
+      list
+    end
   end
 
   private

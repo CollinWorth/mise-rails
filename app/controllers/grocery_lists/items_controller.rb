@@ -11,8 +11,11 @@ class GroceryLists::ItemsController < ApplicationController
     render_sheet(fallback: grocery_list_path) { Views::GroceryLists::Items::Show.new(item: @item) }
   end
 
+  # Asked from the modal frame (a phone) it opens the sheet; from the row's own frame (a desktop) it edits in place.
   def edit
-    render_sheet(fallback: grocery_list_path) { Views::GroceryLists::Items::Edit.new(item: @item) }
+    render_sheet(fallback: grocery_list_path) do
+      turbo_frame_request_id == "modal" ? Views::GroceryLists::Items::Edit.new(item: @item) : Components::GroceryItemEditRow.new(item: @item)
+    end
   end
 
   def update

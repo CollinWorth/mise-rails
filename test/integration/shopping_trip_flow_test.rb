@@ -26,7 +26,7 @@ class ShoppingTripFlowTest < ActionDispatch::IntegrationTest
     assert_select "input[name='ingredient_keys[]'][value=leek][checked]"
     assert_select "input[name='ingredient_keys[]'][value='salt|volume']:not([checked])"
     assert_select "span", text: "in pantry"
-    assert_select "label", text: "5 tomato"
+    assert_select "label", text: "tomato 5"
     assert_select "button[name=pantry_key][value=tomato]", text: "Always have"
     assert_select "button[name=pantry_key][value='salt|volume']", count: 0
   end
@@ -35,7 +35,7 @@ class ShoppingTripFlowTest < ActionDispatch::IntegrationTest
     get new_grocery_list_meal_plan_path(date: @monday, meal_ids: [ "", @soup_meal.id ]), headers: modal_headers.merge("Turbo-Frame" => "shop-ingredients")
 
     assert_select "input[name='meal_ids[]'][checked]", count: 1
-    assert_select "label", text: "2 tomato"
+    assert_select "label", text: "tomato 2"
     assert_select "input[name='ingredient_keys[]'][value=leek]"
     assert_select "input[name='ingredient_keys[]'][value='salt|volume']", count: 0
   end

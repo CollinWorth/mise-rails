@@ -20,17 +20,17 @@ class ShoppingTripTest < ApplicationSystemTestCase
 
   test "review the week, mark one thing as always had, skip another, and add the rest" do
     open_review
-    assert_text "5 tomato"
+    assert_text(/tomato\s+5/)
     assert_selector "span", text: "in pantry", count: 1
-    assert_unchecked_field "1 tsp salt"
+    assert_unchecked_field "salt 1 tsp"
 
     click_button "Always have", match: :first # tomato, the first row
     assert_selector "[data-controller~=sheet]" # the sheet stays open
     assert_selector "span", text: "in pantry", count: 2
-    assert_unchecked_field "5 tomato"
-    assert_checked_field "1 leek"
+    assert_unchecked_field "tomato 5"
+    assert_checked_field "leek 1"
 
-    uncheck "1 leek"
+    uncheck "leek 1"
     click_button "Add ticked items to grocery list"
 
     assert_no_selector "[data-controller~=sheet]"
@@ -41,18 +41,18 @@ class ShoppingTripTest < ApplicationSystemTestCase
 
   test "unticking a meal redraws the ingredients for the others" do
     open_review
-    assert_text "1 leek"
+    assert_text(/leek\s+1/)
 
     uncheck "#{(@monday + 1).strftime('%a')} · Soup"
-    assert_no_text "1 leek"
-    assert_text "3 tomato"
+    assert_no_text(/leek\s+1/)
+    assert_text(/tomato\s+3/)
   end
 
   test "an item's info button shows which meal it came from and how much" do
     @cook.grocery_list.add_meals(@cook.planned_meals.to_a)
     visit grocery_list_path
 
-    within(:xpath, "//a[normalize-space()='5 tomato']/ancestor::div[contains(@class,'justify-between')][1]") { find("a[aria-label='Where this is from']").click }
+    within(find("div.group", text: /tomato\s+5/)) { find("a[aria-label='Where this is from']").click }
     assert_sheet_open
     assert_link "Salad"
     assert_link "Soup"

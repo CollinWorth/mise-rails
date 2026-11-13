@@ -4,17 +4,21 @@ class Views::GroceryLists::Show < Views::Base
   end
 
   def view_template
-    PageHeader(title: "Grocery list") do
-      Link(href: pantry_items_path, variant: :outline) { "Pantry" }
-      Link(href: planned_meals_path, variant: :outline) { "Plan meals" }
+    Narrow do
+      PageHeader(title: "Grocery list") do
+        Link(href: pantry_items_path, variant: :outline) { "Pantry" }
+        Link(href: planned_meals_path, variant: :outline) { "Plan meals" }
+      end
+      add_form
+      items = @list.items.includes(:sources).to_a
+      if items.none?
+        EmptyState(title: "Your list is empty", text: "Add something above, or plan a few meals and shop for the week.", icon: :basket)
+      else
+        to_get, checked = items.partition { |item| !item.checked? }
+        aisles(to_get)
+        checked_section(checked) if checked.any?
+      end
     end
-    add_form
-    items = @list.items.includes(:sources).to_a
-    return Text { "Your list is empty." } if items.none?
-
-    to_get, checked = items.partition { |item| !item.checked? }
-    aisles(to_get)
-    checked_section(checked) if checked.any?
   end
 
   private
@@ -37,7 +41,7 @@ class Views::GroceryLists::Show < Views::Base
 
         Card do
           CardHeader { CardTitle { config["label"] } }
-          CardContent { Stack(gap: :sm) { aisle_items.each { |item| item_row(item) } } }
+          CardContent { Stack(gap: :sm) { aisle_items.each { |item| GroceryItemRow(item:) } } }
         end
       end
     end
@@ -50,22 +54,7 @@ class Views::GroceryLists::Show < Views::Base
             ButtonTo(action: grocery_list_checked_items_path, method: :delete, data: { turbo_confirm: "Remove all checked items?" }) { "Clear" }
           end
         end
-        CardContent { Stack(gap: :sm) { items.each { |item| item_row(item) } } }
-      end
-    end
-
-    # The box toggles checked; the name opens the edit sheet; ⓘ shows where the item came from.
-    def item_row(item)
-      Row(gap: :sm, justify: :between) do
-        Row(gap: :sm) do
-          ActionForm(action: grocery_list_item_path(item), method: :patch, class: "inline") do
-            input(type: :hidden, name: "item[checked]", value: item.checked? ? "0" : "1")
-            Button(type: :submit, variant: item.checked? ? :secondary : :outline, size: :md) { item.checked? ? "☑" : "☐" }
-          end
-          SheetLink(href: edit_grocery_list_item_path(item), variant: :ghost,
-                    class: [ "h-auto justify-start whitespace-normal px-2 py-2 text-left", ("line-through text-muted-foreground" if item.checked?) ]) { item.to_line }
-        end
-        SheetLink(href: grocery_list_item_path(item), variant: :ghost, size: :sm, aria: { label: "Where this is from" }) { "ⓘ" } if item.sources.any?
+        CardContent { Stack(gap: :sm) { items.each { |item| GroceryItemRow(item:) } } }
       end
     end
 end
