@@ -20,7 +20,7 @@ class Components::Navbar < Components::Base
 
   private
     def brand
-      Link(href: root_path, class: "mr-4 h-auto gap-2 px-0 py-0 text-lg font-bold tracking-tight text-foreground") do
+      Link(href: @user ? recipes_path : root_path, class: "mr-4 h-auto gap-2 px-0 py-0 text-lg font-bold tracking-tight text-foreground") do
         Icon(:chef_hat, class: "text-primary")
         plain "Mise"
       end

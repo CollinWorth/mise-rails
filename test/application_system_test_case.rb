@@ -15,7 +15,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     fill_in "Email", with: user.email_address
     fill_in "Password", with: "secret123"
     click_button "Sign in"
-    assert_current_path root_path
+    assert_current_path recipes_path
   end
 
   def on_desktop

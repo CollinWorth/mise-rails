@@ -23,8 +23,9 @@ class Components::Layouts::Application < Components::Base
     })();
   JS
 
-  def initialize(user: Current.user)
+  def initialize(user: Current.user, bleed: false)
     @user = user
+    @bleed = bleed
   end
 
   def view_template(&)
@@ -54,9 +55,13 @@ class Components::Layouts::Application < Components::Base
       body(class: "pb-[calc(env(safe-area-inset-bottom)+5rem)] md:pb-0") do
         Navbar(user: @user)
         FlashMessages(flash: flash)
-        Container do
-          Stack do
-            yield
+        if @bleed
+          yield
+        else
+          Container do
+            Stack do
+              yield
+            end
           end
         end
         turbo_frame(id: "modal") # full-screen sheets (Components::Sheet) load in here

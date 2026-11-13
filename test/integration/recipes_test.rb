@@ -7,7 +7,7 @@ class RecipesTest < ActionDispatch::IntegrationTest
   end
 
   test "anonymous visitors are sent to discover, then sign in" do
-    get root_path
+    get recipes_path
     assert_redirected_to discover_path
 
     get new_recipe_path

@@ -5,8 +5,11 @@ class Views::Base < Components::Base
   def around_template
     return super if view_context.request.headers["Turbo-Frame"].present?
 
-    render(Components::Layouts::Application.new) { super }
+    render(Components::Layouts::Application.new(bleed: bleed?)) { super }
   end
+
+  # Pages that draw their own full-width sections skip the layout's centered column.
+  def bleed? = false
 
   def cache_store = Rails.cache
 end

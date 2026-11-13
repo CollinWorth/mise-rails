@@ -9,7 +9,7 @@ class RegistrationsController < ApplicationController
     user = User.new(params.expect(user: %i[name email_address password]))
     if user.save
       start_new_session_for user
-      redirect_to root_path
+      redirect_to recipes_path
     else
       render Views::Registrations::New.new(user:), status: :unprocessable_content
     end
