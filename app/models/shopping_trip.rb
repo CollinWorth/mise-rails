@@ -1,7 +1,7 @@
 # The "shop for this week" review: a week of planned meals, which of them are included,
 # and the merged ingredient lines they add up to (flagged when they're already in the pantry).
 class ShoppingTrip
-  Line = Struct.new(:key, :name, :text, :recipe_names, :in_pantry, keyword_init: true)
+  Line = Struct.new(:key, :name_key, :name, :text, :recipe_names, :in_pantry, keyword_init: true)
 
   attr_reader :week_start
 
@@ -24,7 +24,7 @@ class ShoppingTrip
   def lines
     pantry = @user.pantry_keys
     totals.map do |entry|
-      Line.new(key: entry.key, name: entry.name, text: entry.to_line, recipe_names: entry.recipe_names, in_pantry: pantry.include?(entry.key))
+      Line.new(key: entry.key, name_key: entry.name_key, name: entry.name, text: entry.to_line, recipe_names: entry.recipe_names, in_pantry: pantry.include?(entry.name_key))
     end
   end
 

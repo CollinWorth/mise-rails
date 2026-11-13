@@ -24,11 +24,11 @@ class ShoppingTripFlowTest < ActionDispatch::IntegrationTest
     assert_select "input[name='meal_ids[]'][checked]", count: 2
     assert_select "input[name='ingredient_keys[]'][value=tomato][checked]"
     assert_select "input[name='ingredient_keys[]'][value=leek][checked]"
-    assert_select "input[name='ingredient_keys[]'][value=salt]:not([checked])"
+    assert_select "input[name='ingredient_keys[]'][value='salt|volume']:not([checked])"
     assert_select "span", text: "in pantry"
     assert_select "label", text: "5 tomato"
     assert_select "button[name=pantry_key][value=tomato]", text: "Always have"
-    assert_select "button[name=pantry_key][value=salt]", count: 0
+    assert_select "button[name=pantry_key][value='salt|volume']", count: 0
   end
 
   test "picking fewer meals redraws the ingredients for just those" do
@@ -37,7 +37,7 @@ class ShoppingTripFlowTest < ActionDispatch::IntegrationTest
     assert_select "input[name='meal_ids[]'][checked]", count: 1
     assert_select "label", text: "2 tomato"
     assert_select "input[name='ingredient_keys[]'][value=leek]"
-    assert_select "input[name='ingredient_keys[]'][value=salt]", count: 0
+    assert_select "input[name='ingredient_keys[]'][value='salt|volume']", count: 0
   end
 
   test "adding adds only the ticked ingredients and remembers where each came from" do

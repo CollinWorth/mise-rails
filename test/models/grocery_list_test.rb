@@ -93,4 +93,45 @@ class GroceryListTest < ActiveSupport::TestCase
     assert_equal "Nothing to add (2 already in your pantry).", GroceryList::Result.new(added: 0, in_pantry: 2).summary
     assert_equal "Nothing to add.", GroceryList::Result.new(added: 0, in_pantry: 0).summary
   end
+
+  # Starts from an empty list (apart from the setup recipe's own items), adds one recipe per line, and returns the list's lines.
+  def list_after_adding(*lines, reset: true)
+    @user.grocery_list.items.destroy_all if reset
+    recipes = lines.each_with_index.map { |(name, quantity, unit), n| create_recipe(@user, name: "Dish #{n}", ingredients: [ { name:, quantity:, unit: } ]) }
+    @user.grocery_list.add_recipes(recipes.map { |recipe| [ recipe, 1 ] })
+    @user.grocery_list.items.reload.reject { |item| %w[onion tomato\ paste].include?(item.name) }.map(&:to_line).sort
+  end
+
+  test "units of the same kind are converted and merged" do
+    assert_equal [ "2 1/4 cup flour" ], list_after_adding([ "flour", "2", "cup" ], [ "flour", "1", "tbsp" ])
+    assert_equal [ "1 1/2 lb ground beef" ], list_after_adding([ "ground beef", "1", "lb" ], [ "ground beef", "8", "oz" ])
+  end
+
+  test "different kinds of unit, unknown units and typos stay as separate lines" do
+    assert_equal [ "1 cup sugar", "200 g sugar" ], list_after_adding([ "sugar", "200", "g" ], [ "sugar", "1", "cup" ])
+    assert_equal [ "1 head garlic", "3 cloves garlic" ], list_after_adding([ "garlic", "3", "cloves" ], [ "garlic", "1", "head" ])
+    assert_equal [ "1 cup flour", "2 cpus flour" ], list_after_adding([ "flour", "2", "cpus" ], [ "flour", "1", "cup" ])
+    assert_equal [ "1 tbsp lemon", "2 lemon" ], list_after_adding([ "lemon", "2", "" ], [ "lemon", "1", "tbsp" ])
+  end
+
+  test "an identical unknown unit still merges" do
+    assert_equal [ "5 cloves garlic" ], list_after_adding([ "garlic", "3", "cloves" ], [ "garlic", "2", "cloves" ])
+  end
+
+  test "adds to an item already on the list when the units can merge, and starts a new one when they can't" do
+    @user.grocery_list.items.destroy_all
+    @user.grocery_list.items.create!(name: "flour", quantity: "1", unit: "cup")
+
+    assert_equal [ "1 1/4 cup flour" ], list_after_adding([ "flour", "2", "tbsp" ], reset: false) # 1 cup + 2 tbsp = 1 1/8, rounded up
+    assert_equal [ "1 1/4 cup flour", "500 g flour" ], list_after_adding([ "flour", "500", "g" ], reset: false)
+  end
+
+  test "the pantry matches an ingredient in any unit" do
+    @user.pantry_items.create!(name: "sugar")
+    recipe = create_recipe(@user, name: "Sweet", ingredients: [ { name: "sugar", quantity: "200", unit: "g" }, { name: "sugar", quantity: "1", unit: "cup" } ])
+
+    result = @user.grocery_list.add_recipes([ [ recipe, 1 ] ])
+
+    assert_equal [ 0, 2 ], [ result.added, result.in_pantry ]
+  end
 end

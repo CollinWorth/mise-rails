@@ -27,7 +27,7 @@ class GroceryList < ApplicationRecord
     IngredientTotals.new(groups).each do |entry|
       next if only && !only.include?(entry.key)
 
-      if pantry.include?(entry.key)
+      if pantry.include?(entry.name_key)
         in_pantry += 1
       else
         merge_item(entry)
@@ -39,11 +39,18 @@ class GroceryList < ApplicationRecord
   end
 
   private
+    # Adds to an item that's the same ingredient in a unit it can merge with, otherwise starts a new item.
     def merge_item(entry)
-      item = items.detect { |existing| IngredientName.normalize(existing.name) == entry.key } || items.build(name: entry.name)
-      total = (item.amount || 0r) + entry.amount
-      item.quantity = total.zero? ? (entry.text || item.quantity) : Quantity.format(total)
-      item.unit ||= entry.unit
+      item = items.detect { |existing| IngredientName.normalize(existing.name) == entry.name_key && Units.group(existing.unit) == entry.group } || items.build(name: entry.name)
+      parts = [ ([ item.amount, item.unit ] if item.amount), ([ entry.amount, entry.unit ] if entry.amount.positive?) ].compact
+      if parts.any?
+        amount, unit = Units.total(parts)
+        item.quantity = Quantity.format(amount)
+        item.unit = unit
+      else
+        item.quantity = entry.text || item.quantity
+        item.unit ||= entry.unit
+      end
       item.save!
       entry.sources.each do |source|
         item.sources.create!(recipe: source.recipe, recipe_name: source.recipe.name, planned_on: source.planned_on,

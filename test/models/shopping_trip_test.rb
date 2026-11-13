@@ -30,13 +30,24 @@ class ShoppingTripTest < ActiveSupport::TestCase
 
     assert_equal "7 tomato", lines["tomato"].text # 3 + 2 x 2
     assert_equal %w[Salad Soup], lines["tomato"].recipe_names
-    assert_equal "1 tsp salt", lines["salt"].text
+    assert_equal "1 tsp salt", lines["salt|volume"].text
     assert_equal [ "4 tomato" ], trip(meal_ids: [ @soup_meal.id ]).lines.map(&:text)
   end
 
   test "lines already in the pantry are flagged" do
     @cook.pantry_items.create!(name: "Salt")
 
-    assert_equal({ "tomato" => false, "salt" => true }, trip.lines.to_h { |line| [ line.key, line.in_pantry ] })
+    assert_equal({ "tomato" => false, "salt|volume" => true }, trip.lines.to_h { |line| [ line.key, line.in_pantry ] })
+  end
+
+  test "the pantry flags an ingredient in every unit it appears in" do
+    @cook.pantry_items.create!(name: "flour")
+    cake = create_recipe(@cook, name: "Cake", ingredients: [ { name: "flour", quantity: "200", unit: "g" }, { name: "flour", quantity: "1", unit: "cup" } ])
+    @cook.planned_meals.create!(recipe: cake, date: @monday + 3)
+
+    flour_lines = trip.lines.select { |line| line.name_key == "flour" }
+
+    assert_equal %w[flour|weight flour|volume], flour_lines.map(&:key)
+    assert flour_lines.all?(&:in_pantry)
   end
 end

@@ -14,3 +14,14 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym "RESTful"
 # end
+
+# Rails would turn "cloves" into "clofe" and "leaves" into "leafe", so these wouldn't match their singular forms.
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.irregular "clove", "cloves"
+  inflect.irregular "olive", "olives"
+  inflect.irregular "chive", "chives"
+  inflect.irregular "leaf", "leaves"
+  inflect.irregular "loaf", "loaves"
+  inflect.irregular "half", "halves"
+  inflect.irregular "knife", "knives"
+end
