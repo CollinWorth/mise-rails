@@ -5,6 +5,9 @@ class Components::Layouts::Application < Components::Base
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
+  # Browsers hold on to icons for a long time; bump this when the logo changes (bin/rails icons:generate) so they fetch the new one.
+  ICON_VERSION = 2
+
   # With "match my device" the browser picks the light or dark theme as the phone does, and follows it when it changes
   # (a pinned light or dark appearance is already settled when the page is rendered).
   FOLLOW_DEVICE = <<~JS.squish.freeze
@@ -36,7 +39,10 @@ class Components::Layouts::Application < Components::Base
         meta(name: "apple-mobile-web-app-title", content: "Mise")
         meta(name: "apple-mobile-web-app-status-bar-style", content: "black-translucent")
         link(rel: "manifest", href: pwa_manifest_path(format: :json))
-        link(rel: "apple-touch-icon", href: "/apple-touch-icon.png")
+        link(rel: "icon", href: "/icon.svg?v=#{ICON_VERSION}", type: "image/svg+xml")
+        link(rel: "icon", href: "/favicon-32.png?v=#{ICON_VERSION}", type: "image/png", sizes: "32x32")
+        link(rel: "alternate icon", href: "/favicon.ico?v=#{ICON_VERSION}")
+        link(rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=#{ICON_VERSION}")
         meta(name: "turbo-refresh-method", content: "morph")
         meta(name: "turbo-refresh-scroll", content: "preserve")
         csrf_meta_tags
