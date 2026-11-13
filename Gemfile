@@ -66,6 +66,8 @@ gem "ruby_ui", "~> 1.6", group: :development
 gem "tailwind_merge", "~> 1.5"
 
 gem "ingreedy", "~> 0.1.0"
+# Reads the old Mongo dump (bin/rails import:mongo)
+gem "bson", "~> 5.0", require: false
 
 gem "pagy", "~> 43.8"
 
