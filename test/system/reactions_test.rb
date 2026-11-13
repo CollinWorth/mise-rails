@@ -8,7 +8,7 @@ class ReactionsTest < ApplicationSystemTestCase
   end
 
   test "clicking a star rates the recipe and clear removes it" do
-    star_buttons = -> { all("button", text: "★").map { |button| button[:class].split.include?("bg-primary") } }
+    star_buttons = -> { all("button", text: "★").map { |button| button[:class].split.include?("text-primary") } }
     assert_equal [ false, false, false ], star_buttons.call
 
     all("button", text: "★")[1].click
@@ -38,26 +38,35 @@ class ReactionsTest < ApplicationSystemTestCase
   test "buttons keep the scroll position instead of jumping to the top" do
     tall = create_recipe(@recipe.user, name: "Long Recipe", ingredients: Array.new(40) { |n| { name: "ingredient #{n}" } })
     visit recipe_path(tall)
+    page.execute_script("window.scrollTo(0, 260)")
+
+    click_button "♡ 0"
+    assert_button "♥ 1"
+    assert_in_delta 260, page.evaluate_script("Math.round(scrollY)"), 60
+  end
+
+  test "posting a comment at the bottom of a long page keeps the scroll position" do
+    tall = create_recipe(@recipe.user, name: "Long Recipe", ingredients: Array.new(40) { |n| { name: "ingredient #{n}" } })
+    visit recipe_path(tall)
     page.execute_script("window.scrollTo(0, document.body.scrollHeight)")
     before = page.evaluate_script("Math.round(scrollY)")
     assert_operator before, :>, 300
 
-    click_button "♡ 0"
-    assert_button "♥ 1"
-    assert_in_delta before, page.evaluate_script("Math.round(scrollY)"), 100
+    fill_in "comment[body]", with: "Looks great"
+    click_button "Post"
+    assert_text "Comments (1)"
+    assert_in_delta before, page.evaluate_script("Math.round(scrollY)"), 150
   end
 
   test "rating a scaled recipe keeps the scale and the scroll position" do
     tall = create_recipe(@recipe.user, name: "Long Recipe", ingredients: Array.new(40) { |n| { name: "ingredient #{n}", quantity: "2" } })
     visit recipe_path(tall, scale: "2")
-    page.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-    before = page.evaluate_script("Math.round(scrollY)")
-    assert_operator before, :>, 300
+    page.execute_script("window.scrollTo(0, 260)")
 
     all("button", text: "★")[1].click
     assert_selector "button", text: "Clear"
     assert_equal "2", URI.parse(current_url).query.to_s[/scale=(\d)/, 1]
-    assert_in_delta before, page.evaluate_script("Math.round(scrollY)"), 100
+    assert_in_delta 260, page.evaluate_script("Math.round(scrollY)"), 60
   end
 
   test "changing the scale from partway down the page doesn't jump to the top" do

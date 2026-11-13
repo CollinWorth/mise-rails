@@ -1,34 +1,64 @@
+# The sticky top bar: brand, main links (desktop; phones use the TabBar), theme toggle and account menu.
 class Components::Navbar < Components::Base
+  include Components::NavLinks
+
   def initialize(user:)
     @user = user
   end
 
   def view_template
-    Container do
-      Row(justify: :between) do
-        Row(gap: :sm) do
-          Link(href: root_path) { Heading(level: 3) { "Mise" } }
-          Link(href: discover_path) { "Discover" }
-          if @user
-            Row(gap: :sm, class: "hidden md:flex") do
-              Link(href: recipes_path) { "My recipes" }
-              Link(href: planned_meals_path) { "Calendar" }
-              Link(href: grocery_list_path) { "Groceries" }
-            end
-          end
-        end
-        Row(gap: :sm) do
-          Button(variant: :ghost, size: :sm, data: { controller: "theme", action: "theme#toggle" }) { "Theme" }
-          if @user
-            Link(href: profile_path) { @user.name }
-            ActionForm(action: session_path, method: :delete, class: "hidden md:block") { Button(type: :submit, variant: :ghost, size: :sm) { "Sign out" } }
-          else
-            Link(href: new_session_path) { "Sign in" }
-            Link(href: new_registration_path) { "Sign up" }
-          end
+    header(class: "sticky top-0 z-40 border-b bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur supports-[backdrop-filter]:bg-background/60") do
+      div(class: "mx-auto flex h-14 max-w-6xl items-center gap-2 px-4") do
+        brand
+        links if @user
+        div(class: "ml-auto flex items-center gap-1") do
+          theme_toggle
+          @user ? account_menu : sign_in_links
         end
       end
     end
-    Separator()
   end
+
+  private
+    def brand
+      Link(href: root_path, class: "mr-4 h-auto gap-2 px-0 py-0 text-lg font-bold tracking-tight text-foreground") do
+        Icon(:chef_hat, class: "text-primary")
+        plain "Mise"
+      end
+    end
+
+    def links
+      nav(class: "hidden items-center gap-1 md:flex") do
+        ITEMS.each do |item|
+          Link(href: public_send(item[:path]), variant: current?(item) ? :secondary : :ghost, size: :sm, class: [ "font-medium", ("text-primary" if current?(item)) ], aria: { current: ("page" if current?(item)) }) { item[:label] }
+        end
+      end
+    end
+
+    def theme_toggle
+      Button(variant: :ghost, size: :sm, class: "size-9 rounded-full p-0", aria: { label: "Toggle theme" }, data: { controller: "theme", action: "theme#toggle" }) do
+        Icon(:moon, class: "dark:hidden")
+        Icon(:sun, class: "hidden dark:block")
+      end
+    end
+
+    def account_menu
+      Menu(label: "Account menu", trigger: -> { Avatar(name: @user.name) }) do
+        div(class: "px-3 py-2") do
+          p(class: "text-sm font-medium") { @user.name }
+          p(class: "truncate text-xs text-muted-foreground") { @user.email_address }
+        end
+        Separator(class: "my-1")
+        MenuItem(href: profile_path, icon: :user) { "Your account" }
+        MenuItem(href: pantry_items_path, icon: :basket) { "Pantry" }
+        MenuItem(href: users_path, icon: :users) { "Find cooks" }
+        Separator(class: "my-1")
+        MenuItem(action: session_path, method: :delete, icon: :log_out) { "Sign out" }
+      end
+    end
+
+    def sign_in_links
+      Link(href: new_session_path, variant: :ghost, size: :sm) { "Sign in" }
+      Link(href: new_registration_path, variant: :primary, size: :sm) { "Sign up" }
+    end
 end

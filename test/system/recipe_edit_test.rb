@@ -26,17 +26,34 @@ class RecipeEditTest < ApplicationSystemTestCase
     all("input[placeholder=Ingredient]").last.set("butter")
     click_button "Save recipe"
 
-    assert_text "For the spread"
+    assert_text(/for the spread/i) # shown as small capitals
     assert_equal [ "bread", "For the spread", "butter" ], @recipe.reload.ingredients.map(&:name)
     assert @recipe.ingredients.find_by(name: "For the spread").section?
+  end
+
+  test "the recipe page's menu offers edit to its owner, and saving to everyone else" do
+    visit recipe_path(@recipe)
+    click_button "More actions"
+    assert_link "Edit"
+    assert_no_button "Save to my recipes"
+
+    click_button "Account menu"
+    click_button "Sign out"
+    sign_in_through_form(create_user(name: "Sam"))
+    visit recipe_path(@recipe)
+    click_button "More actions"
+    assert_button "Save to my recipes"
+    assert_no_link "Edit"
   end
 
   test "deleting a recipe asks first" do
     visit recipe_path(@recipe)
 
+    click_button "More actions"
     dismiss_confirm { click_button "Delete" }
     assert Recipe.exists?(@recipe.id)
 
+    click_button "More actions"
     accept_confirm { click_button "Delete" }
     assert_text "Recipe deleted."
     assert_not Recipe.exists?(@recipe.id)

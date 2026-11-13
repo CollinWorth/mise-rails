@@ -5,5 +5,5 @@ class Components::TextLink < Components::Base
     @attrs = attrs
   end
 
-  def view_template(&) = Link(href: @href, **@attrs, class: "h-auto justify-start whitespace-normal px-0 py-0 text-left", &)
+  def view_template(&) = Link(href: @href, class: [ "h-auto justify-start whitespace-normal px-0 py-0 text-left", @attrs.delete(:class) ], **@attrs, &)
 end

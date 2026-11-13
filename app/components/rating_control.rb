@@ -7,12 +7,14 @@ class Components::RatingControl < Components::Base
 
   def view_template
     Row(gap: :sm) do
-      Text { "Your rating:" }
-      (1..3).each do |value|
-        ButtonTo(action: recipe_rating_path(@recipe), method: :put, params: { value: },
-                 variant: @user_rating.to_i >= value ? :primary : :outline) { "★" }
+      Text(size: "2", class: "text-muted-foreground") { "Your rating" }
+      Row(gap: :sm, class: "gap-0") do
+        (1..3).each do |value|
+          ButtonTo(action: recipe_rating_path(@recipe), method: :put, params: { value: }, variant: :ghost,
+                   button_class: [ "px-1.5 text-xl", (@user_rating.to_i >= value ? "text-primary" : "text-muted-foreground/50") ]) { "★" }
+        end
       end
-      ButtonTo(action: recipe_rating_path(@recipe), method: :delete, variant: :ghost) { "Clear" } if @user_rating
+      ButtonTo(action: recipe_rating_path(@recipe), method: :delete, variant: :ghost, button_class: "text-xs text-muted-foreground") { "Clear" } if @user_rating
     end
   end
 end

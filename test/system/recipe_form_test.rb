@@ -21,7 +21,7 @@ class RecipeFormTest < ApplicationSystemTestCase
     assert_text "Recipe saved."
     assert_text "butter"
     assert_no_text "bread"
-    assert_text "2. Butter it."
+    assert_text "Butter it."
   end
 
   test "Return in an ingredient moves to the next row and adds one at the end" do

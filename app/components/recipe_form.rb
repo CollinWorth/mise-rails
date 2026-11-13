@@ -18,12 +18,7 @@ class Components::RecipeForm < Components::Base
           field(:cook_time, "Cook (min)", type: :number, inputmode: "numeric")
           field(:servings, "Servings", type: :number, inputmode: "numeric")
         end
-        FormField do
-          FormFieldLabel(for: "recipe_image") { "Photo" }
-          current_photo
-          Input(type: :file, id: "recipe_image", name: "recipe[image]", accept: "image/*")
-          input(type: :hidden, name: "recipe[image_url]", value: @recipe.image_url) if @recipe.image_url.present?
-        end
+        PhotoField(recipe: @recipe)
         ingredients
         field(:source_url, "Source link (optional)", type: :url, inputmode: "url", autocapitalize: "none", autocorrect: "off")
         TextAreaField(label: "Instructions (one step per line)", name: "recipe[instructions]", value: @recipe.instructions, rows: 10)
@@ -43,17 +38,6 @@ class Components::RecipeForm < Components::Base
   private
     def field(attribute, label, type: :text, **attrs)
       Field(label:, name: "recipe[#{attribute}]", type:, value: @recipe.public_send(attribute), errors: @recipe.errors[attribute], **attrs)
-    end
-
-    def current_photo
-      return unless @recipe.persisted? && @recipe.image.attached? && @recipe.image.blob.persisted?
-
-      RecipeImage(recipe: @recipe)
-      Row(gap: :sm) do
-        input(type: :hidden, name: "recipe[remove_image]", value: "0")
-        Checkbox(id: "recipe_remove_image", name: "recipe[remove_image]", value: "1")
-        FormFieldLabel(for: "recipe_remove_image") { "Remove photo" }
-      end
     end
 
     def ingredients

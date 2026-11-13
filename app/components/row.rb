@@ -12,5 +12,5 @@ class Components::Row < Components::Base
     div(class: [ "flex flex-wrap items-center", GAPS.fetch(@gap), JUSTIFY.fetch(@justify), @attrs.delete(:class) ], **@attrs, &)
   end
 
-  JUSTIFY = { start: "justify-start", between: "justify-between", end: "justify-end" }.freeze
+  JUSTIFY = { start: "justify-start", center: "justify-center", between: "justify-between", end: "justify-end" }.freeze
 end

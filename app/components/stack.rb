@@ -8,5 +8,5 @@ class Components::Stack < Components::Base
     @gap = gap
   end
 
-  def view_template(&) = div(class: [ "flex flex-col", GAPS.fetch(@gap) ], **@attrs, &)
+  def view_template(&) = div(class: [ "flex flex-col", GAPS.fetch(@gap), @attrs.delete(:class) ], **@attrs, &)
 end

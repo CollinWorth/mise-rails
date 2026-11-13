@@ -5,24 +5,21 @@ class Views::Recipes::Show < Views::Base
   end
 
   def view_template
-    PageHeader(title: @recipe.name) { actions }
-    Row(gap: :sm) do
-      TextLink(href: user_path(@recipe.user)) { "by #{@recipe.user.name}" }
-      Badge(variant: :outline) { "Prep #{@recipe.prep_time} min" } if @recipe.prep_time
-      Badge(variant: :outline) { "Cook #{@recipe.cook_time} min" } if @recipe.cook_time
-      Badge(variant: :outline) { "Serves #{Quantity.format(@recipe.servings * @scale.factor)}" } if @recipe.servings
-      Badge(variant: :outline) { @recipe.cuisine } if @recipe.cuisine.present?
-      Badge(variant: :outline) { @recipe.category } if @recipe.category.present?
-      Badge(variant: :outline) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
+    Grid(columns: :hero) do
+      RecipeImage(recipe: @recipe, size: :hero, class: "rounded-xl")
+      Stack(gap: :lg) do
+        title_block
+        Row(gap: :sm) { actions }
+        reactions
+      end
     end
-    TextLink(href: @recipe.source_url, target: "_blank", rel: "noopener noreferrer") { "Source: #{@recipe.source_host}" } if @recipe.source_host
-    Text { "Saved from #{@recipe.original.user.name}'s recipe" } if @recipe.original && @recipe.original.public?
-    RecipeImage(recipe: @recipe, size: :full)
-    Grid(columns: 2) do
+    Grid(columns: :aside) do
       ingredients
-      steps
+      Stack do
+        Heading(level: 2) { "Instructions" }
+        Steps(steps: @recipe.steps)
+      end
     end
-    reactions
     versions
     comments
   end
@@ -30,26 +27,58 @@ class Views::Recipes::Show < Views::Base
   private
     def owner? = Current.user == @recipe.user
 
+    def title_block
+      Stack(gap: :sm) do
+        Row(gap: :sm) do
+          Avatar(name: @recipe.user.name, size: "size-6 text-xs")
+          TextLink(href: user_path(@recipe.user), class: "text-sm font-medium text-foreground") { @recipe.user.name }
+          Text(size: "2", class: "text-muted-foreground") { "Saved from #{@recipe.original.user.name}'s recipe" } if @recipe.original && @recipe.original.public?
+        end
+        Heading(level: 1) { @recipe.name }
+        facts
+        TextLink(href: @recipe.source_url, target: "_blank", rel: "noopener noreferrer", class: "text-sm") { "Source: #{@recipe.source_host}" } if @recipe.source_host
+      end
+    end
+
+    def facts
+      Row(gap: :sm) do
+        Badge(variant: :outline) { "Prep #{@recipe.prep_time} min" } if @recipe.prep_time
+        Badge(variant: :outline) { "Cook #{@recipe.cook_time} min" } if @recipe.cook_time
+        Badge(variant: :outline) { "Serves #{Quantity.format(@recipe.servings * @scale.factor)}" } if @recipe.servings
+        Badge(variant: :outline) { @recipe.cuisine } if @recipe.cuisine.present?
+        Badge(variant: :outline) { @recipe.category } if @recipe.category.present?
+        Badge(variant: :outline) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
+      end
+    end
+
     def actions
-      Link(href: recipe_cook_path(@recipe, scale: @scale.to_param), variant: :primary) { "Cook" }
+      Link(href: recipe_cook_path(@recipe, scale: @scale.to_param), variant: :primary, size: :lg, class: "gap-2") do
+        Icon(:flame, class: "size-4")
+        plain "Cook"
+      end
       if Current.user
-        SheetLink(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :outline) { "Add to plan" }
-        ButtonTo(action: recipe_grocery_items_path(@recipe), params: { scale: @scale.key }, size: :md) { "Add to grocery list" }
+        SheetLink(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :outline, size: :lg) { "Add to plan" }
+        ButtonTo(action: recipe_grocery_items_path(@recipe), params: { scale: @scale.key }, size: :lg) { "Add to grocery list" }
       end
-      if @recipe.public?
-        Button(type: :button, variant: :outline, size: :md, hidden: true,
-               data: { controller: "share", action: "share#share", share_title_value: @recipe.name, share_url_value: recipe_url(@recipe) }) { "Share" }
-      end
-      if owner?
-        Link(href: edit_recipe_path(@recipe), variant: :outline) { "Edit" }
-        ButtonTo(action: recipe_path(@recipe), method: :delete, variant: :destructive, data: { turbo_confirm: "Delete #{@recipe.name}? This can't be undone." }) { "Delete" }
-      elsif Current.user
-        ButtonTo(action: recipe_copy_path(@recipe)) { "Save to my recipes" }
+      more_menu if Current.user || @recipe.public?
+    end
+
+    def more_menu
+      Menu(label: "More actions", align: :start, trigger: -> { span(class: "flex size-10 items-center justify-center rounded-full border") { Icon(:ellipsis) } }) do
+        if @recipe.public?
+          MenuItem(icon: :share, hidden: true, data: { controller: "share", action: "share#share", share_title_value: @recipe.name, share_url_value: recipe_url(@recipe) }) { "Share" }
+        end
+        if owner?
+          MenuItem(href: edit_recipe_path(@recipe), icon: :pencil) { "Edit" }
+          MenuItem(action: recipe_path(@recipe), method: :delete, icon: :trash, data: { turbo_confirm: "Delete #{@recipe.name}? This can't be undone." }) { "Delete" }
+        elsif Current.user
+          MenuItem(action: recipe_copy_path(@recipe), icon: :bookmark) { "Save to my recipes" }
+        end
       end
     end
 
     def ingredients
-      Card do
+      Card(class: "lg:sticky lg:top-20") do
         CardHeader do
           Row(justify: :between) do
             CardTitle { "Ingredients" }
@@ -60,7 +89,7 @@ class Views::Recipes::Show < Views::Base
           Stack(gap: :sm) do
             @recipe.ingredients.each do |ingredient|
               if ingredient.section?
-                Heading(level: 4) { ingredient.name }
+                Heading(level: 4, class: "mt-2 text-sm uppercase tracking-wide text-muted-foreground") { ingredient.name }
               else
                 Text { ingredient.to_line(@scale.factor) }
               end
@@ -71,19 +100,8 @@ class Views::Recipes::Show < Views::Base
     end
 
     def scale_links
-      Row(gap: :sm) do
-        Scale::ALL.each do |scale|
-          Link(href: recipe_path(@recipe, scale: scale.to_param), variant: scale == @scale ? :secondary : :ghost, size: :sm, data: { turbo_action: "replace" }) { scale.label }
-        end
-      end
-    end
-
-    def steps
-      Card do
-        CardHeader { CardTitle { "Instructions" } }
-        CardContent do
-          Stack(gap: :sm) { @recipe.steps.each_with_index { |step, index| Text { "#{index + 1}. #{step}" } } }
-        end
+      Segmented do |scales|
+        Scale::ALL.each { |scale| scales.option(scale.label, recipe_path(@recipe, scale: scale.to_param), active: scale == @scale, data: { turbo_action: "replace" }) }
       end
     end
 
@@ -108,24 +126,34 @@ class Views::Recipes::Show < Views::Base
     end
 
     def comments
-      Heading(level: 3) { "Comments (#{@recipe.comments.size})" }
-      @recipe.comments.includes(:user).each do |comment|
-        Card do
-          CardHeader { CardDescription { comment.user.name } }
-          CardContent do
-            Row(justify: :between) do
-              Text { comment.body }
-              ButtonTo(action: recipe_comment_path(@recipe, comment), method: :delete, variant: :ghost) { "Delete" } if comment.user == Current.user
+      Stack(class: "max-w-2xl") do
+        Heading(level: 3) { "Comments (#{@recipe.comments.size})" }
+        @recipe.comments.includes(:user).each { |comment| comment_row(comment) }
+        comment_form if Current.user
+      end
+    end
+
+    def comment_row(comment)
+      Row(gap: :sm, class: "flex-nowrap items-start") do
+        Avatar(name: comment.user.name)
+        Stack(gap: :sm, class: "min-w-0 flex-1") do
+          Row(gap: :sm, justify: :between) do
+            Row(gap: :sm) do
+              span(class: "text-sm font-medium") { comment.user.name }
+              span(class: "text-xs text-muted-foreground") { "#{view_context.time_ago_in_words(comment.created_at)} ago" }
             end
+            ButtonTo(action: recipe_comment_path(@recipe, comment), method: :delete, variant: :ghost, button_class: "h-auto px-1 py-0 text-xs text-muted-foreground") { "Delete" } if comment.user == Current.user
           end
+          Text { comment.body }
         end
       end
-      return unless Current.user
+    end
 
+    def comment_form
       ActionForm(action: recipe_comments_path(@recipe)) do
         Stack(gap: :sm) do
           TextAreaField(label: "Add a comment", name: "comment[body]", rows: 3)
-          Button(type: :submit) { "Post" }
+          Button(type: :submit, class: "self-start") { "Post" }
         end
       end
     end

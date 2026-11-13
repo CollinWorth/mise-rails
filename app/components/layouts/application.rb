@@ -29,7 +29,7 @@ class Components::Layouts::Application < Components::Base
         stylesheet_link_tag "tailwind", data_turbo_track: "reload"
         javascript_importmap_tags
       end
-      body(class: "pt-[env(safe-area-inset-top)] pb-[calc(env(safe-area-inset-bottom)+4.5rem)] md:pb-0") do
+      body(class: "pb-[calc(env(safe-area-inset-bottom)+5rem)] md:pb-0") do
         Navbar(user: @user)
         FlashMessages(flash: flash)
         Container do

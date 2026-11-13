@@ -11,9 +11,9 @@ class Views::Discover::Show < Views::Base
       Link(href: users_path, variant: :outline) { "Find cooks" }
     end
     Row(justify: :between) do
-      Row(gap: :sm) do
-        Link(href: discover_path, variant: @tab == "feed" ? :ghost : :secondary) { "Explore" }
-        Link(href: discover_path(tab: :feed), variant: @tab == "feed" ? :secondary : :ghost) { "Following" } if authenticated?
+      Segmented do |tabs|
+        tabs.option("Explore", discover_path, active: @tab != "feed")
+        tabs.option("Following", discover_path(tab: :feed), active: @tab == "feed") if authenticated?
       end
       SearchForm(action: discover_path, query: @query, placeholder: "Search recipes", tab: @tab)
     end

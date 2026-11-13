@@ -5,7 +5,7 @@ class ThemeAndToastTest < ApplicationSystemTestCase
     visit discover_path
     assert_no_selector "html.dark"
 
-    click_button "Theme"
+    click_button "Toggle theme"
     assert_selector "html.dark"
 
     visit discover_path
