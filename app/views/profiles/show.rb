@@ -21,6 +21,14 @@ class Views::Profiles::Show < Views::Base
       end
     end
 
+    Card do
+      CardHeader do
+        CardTitle { "Appearance" }
+        CardDescription { "Pick the colors Mise uses. It follows light and dark mode." }
+      end
+      CardContent { PalettePicker(selected: @user.palette) }
+    end
+
     ActionForm(action: session_path, method: :delete) { Button(type: :submit, variant: :outline) { "Sign out" } }
 
     Card do

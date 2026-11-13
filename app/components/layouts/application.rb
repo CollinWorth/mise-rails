@@ -11,7 +11,7 @@ class Components::Layouts::Application < Components::Base
 
   def view_template(&)
     doctype
-    html(class: Current.theme == "dark" ? "dark" : nil) do
+    html(class: Current.theme == "dark" ? "dark" : nil, data: { palette: Current.user&.palette || Palette::DEFAULT }) do
       head do
         title { "Mise" }
         meta(name: "viewport", content: "width=device-width,initial-scale=1,viewport-fit=cover")
