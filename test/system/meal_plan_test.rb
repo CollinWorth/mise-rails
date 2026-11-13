@@ -44,6 +44,18 @@ class MealPlanTest < ApplicationSystemTestCase
     assert_equal Date.current + 1, @cook.planned_meals.last.date
   end
 
+  test "a recipe card in the list can be planned without opening the recipe" do
+    visit recipes_path
+    click_link "Add Greek Salad to plan"
+    assert_sheet_open
+    click_button "Tomorrow"
+
+    assert_no_selector "[data-controller~=sheet]"
+    assert_current_path recipes_path
+    assert_text "Added Greek Salad"
+    assert_equal [ @salad.id, Date.current + 1 ], @cook.planned_meals.pluck(:recipe_id, :date).last
+  end
+
   test "today is highlighted in the planner" do
     visit planned_meals_path
     assert_selector "[data-controller~=scroll-into-view]", text: "Today"

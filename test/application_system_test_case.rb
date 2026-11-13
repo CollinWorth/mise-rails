@@ -7,6 +7,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     options.add_argument("--disable-dev-shm-usage")
   end
 
+  # Icon-only and repeated buttons are named by aria-label, as a screen reader would hear them.
+  setup { Capybara.enable_aria_label = true }
+
   def sign_in_through_form(user)
     visit new_session_path
     fill_in "Email", with: user.email_address

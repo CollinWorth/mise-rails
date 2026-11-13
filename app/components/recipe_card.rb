@@ -19,6 +19,7 @@ class Components::RecipeCard < Components::Base
           Badge(variant: :secondary) { "Private" } unless @recipe.public?
         end
       end
+      CardFooter { SheetLink(href: new_planned_meal_path(recipe_id: @recipe.id), variant: :outline, size: :sm, aria: { label: "Add #{@recipe.name} to plan" }) { "+ Plan" } }
     end
   end
 
