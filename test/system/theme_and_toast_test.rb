@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class ThemeAndToastTest < ApplicationSystemTestCase
+class ThemeAndToastSystemTest < ApplicationSystemTestCase
   def root(attribute) = page.evaluate_script("document.documentElement.#{attribute}")
 
   # The profile saves a moment after a choice; wait for that instead of racing it.

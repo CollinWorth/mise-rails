@@ -20,16 +20,10 @@ class Components::GroceryItemRow < Components::Base
       ActionForm(action: grocery_list_item_path(@item), method: :patch, top: true, class: "min-w-0 flex-1") do
         input(type: :hidden, name: "item[checked]", value: @item.checked? ? "0" : "1")
         Button(type: :submit, variant: :ghost, class: "h-auto w-full justify-start gap-3 whitespace-normal px-2 py-2.5 text-left font-normal") do
-          check_circle
+          CheckCircle(checked: @item.checked?)
           span(class: [ "min-w-0 flex-1 truncate text-base font-medium", ("text-muted-foreground line-through" if @item.checked?) ]) { @item.name }
           span(class: "shrink-0 text-sm text-muted-foreground") { @item.amount_text }
         end
-      end
-    end
-
-    def check_circle
-      span(class: [ "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition", (@item.checked? ? "border-brand-2 bg-brand-2 text-brand-2-foreground" : "border-muted-foreground/40") ]) do
-        Icon(:check, class: "size-3") if @item.checked?
       end
     end
 

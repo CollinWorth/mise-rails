@@ -2,7 +2,7 @@ require "vips"
 
 # The Mise logo (a chef's toque on the brand-orange gradient) lives here, and every icon is drawn from it:
 #   bin/rails icons:generate
-# Change the colors or the shape below, run the task, and commit what it writes to public/.
+# Change the colors or the shape below, run the task, and commit what it writes to public/ (OUTPUT=dir writes elsewhere).
 namespace :icons do
   HAT = <<~SVG.squish.freeze
     <g fill="#000" opacity=".16" transform="translate(0 10)">
@@ -37,7 +37,8 @@ namespace :icons do
   task generate: :environment do
     # Rails tells libvips not to open SVGs (they can be hostile when uploaded); this one is our own, so allow it just here.
     Vips.block_untrusted(false)
-    public = Rails.root.join("public")
+    public = Pathname(ENV.fetch("OUTPUT", Rails.root.join("public").to_s))
+    public.mkpath
     rounded = logo(corner: 112, mark: 1.22)
     square = logo(corner: 0, mark: 1.22)
     maskable = logo(corner: 0, mark: 1.0) # keeps the hat inside the circle phones crop app icons to

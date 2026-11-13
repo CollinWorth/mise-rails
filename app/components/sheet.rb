@@ -10,7 +10,7 @@ class Components::Sheet < Components::Base
   def view_template(&)
     turbo_frame(id: "modal") do
       div(data: { controller: "sheet", action: "turbo:submit-start->sheet#closing keydown.esc@window->sheet#dismiss click->sheet#backdrop" },
-          class: "fixed inset-0 z-50 animate-in fade-in duration-200 md:flex md:items-center md:justify-center md:bg-black/50 md:p-6") do
+          class: "fixed inset-0 z-50 animate-in fade-in duration-200 md:flex md:items-center md:justify-center md:bg-foreground/50 md:p-6") do
         div(data: { sheet_target: "panel" },
             class: "flex h-full flex-col bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] animate-in duration-200 max-md:slide-in-from-bottom md:zoom-in-95 " \
                    "md:h-auto md:max-h-[85vh] md:w-full md:max-w-xl md:rounded-xl md:border md:pt-0 md:pb-0 md:shadow-2xl") do

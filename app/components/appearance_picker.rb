@@ -43,12 +43,7 @@ class Components::AppearancePicker < Components::Base
       label(class: "cursor-pointer") do
         input(type: :radio, name: "user[#{field}]", value: key, checked: key == selected, class: "peer sr-only")
         div(data: { palette: key }, class: "flex flex-col gap-2 rounded-xl border-2 bg-background p-3 text-foreground transition peer-checked:border-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring") do
-          div(class: "flex gap-1.5") do
-            span(class: "size-5 rounded-full bg-primary")
-            span(class: "size-5 rounded-full bg-brand-2")
-            span(class: "size-5 rounded-full bg-brand-3")
-            span(class: "size-5 rounded-full border bg-card")
-          end
+          Swatches()
           span(class: "text-sm font-medium") { name }
         end
       end

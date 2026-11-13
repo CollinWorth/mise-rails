@@ -22,16 +22,11 @@ class Components::StepsEditor < Components::Base
   private
     def row(text, number)
       li(class: "flex items-start gap-2", data: { steps_target: "item", reorder_item: true }) do
-        grip
-        span(class: "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-2 text-sm font-semibold text-brand-2-foreground", data: { steps_target: "number" }) { number }
+        GripButton(label: "Move step", controller: "steps", class: "mt-0.5")
+        NumberBadge(number:, class: "mt-0.5", data: { steps_target: "number" })
         Textarea(rows: 1, placeholder: "Describe this step", aria: { label: "Step" }, class: "min-h-0 min-w-0 flex-1 resize-none overflow-hidden py-2 leading-snug",
                  data: { steps_target: "text", action: "input->steps#input keydown.enter->steps#enter keydown->steps#backspace paste->steps#paste" }) { text }
-        Button(type: :button, variant: :ghost, size: :sm, class: "mt-0.5 size-8 shrink-0 p-0 text-muted-foreground", aria: { label: "Remove step" }, data: { action: "steps#remove" }) { Icon(:x, class: "size-4") }
+        RemoveButton(label: "Remove step", action: "steps#remove", class: "mt-0.5")
       end
-    end
-
-    def grip
-      Button(type: :button, variant: :ghost, size: :sm, class: "mt-0.5 size-8 shrink-0 cursor-grab touch-none p-0 text-muted-foreground", aria: { label: "Move step, or press the up and down arrows" },
-             data: { handle: true, action: "keydown.up->steps#moveUp keydown.down->steps#moveDown" }) { Icon(:grip, class: "size-4") }
     end
 end

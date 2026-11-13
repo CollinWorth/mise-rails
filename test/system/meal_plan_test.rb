@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class MealPlanTest < ApplicationSystemTestCase
+class MealPlanSystemTest < ApplicationSystemTestCase
   setup do
     @cook = create_user(name: "Maria")
     @salad = create_recipe(@cook, name: "Greek Salad")

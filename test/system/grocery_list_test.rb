@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class GroceryListTest < ApplicationSystemTestCase
+class GroceryListSystemTest < ApplicationSystemTestCase
   setup do
     @cook = create_user(name: "Maria")
     @bananas = @cook.grocery_list.items.create!(name: "bananas", quantity: "6")

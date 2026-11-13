@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class RecipeChecklistTest < ApplicationSystemTestCase
+class RecipeChecklistSystemTest < ApplicationSystemTestCase
   setup do
     @cook = create_user(name: "Maria")
     @recipe = create_recipe(@cook, name: "Toast", ingredients: [ { name: "bread", quantity: "2" }, { name: "butter", quantity: "1", unit: "tbsp" } ])

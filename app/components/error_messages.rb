@@ -6,7 +6,7 @@ class Components::ErrorMessages < Components::Base
   def view_template
     return if @record.errors.empty?
 
-    Alert(variant: :destructive) do
+    Alert(variant: :destructive, role: "alert") do
       AlertDescription { @record.errors.full_messages.to_sentence }
     end
   end

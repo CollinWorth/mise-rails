@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class NavigationTest < ApplicationSystemTestCase
+class NavigationSystemTest < ApplicationSystemTestCase
   setup do
     @cook = create_user(name: "Maria")
     sign_in_through_form(@cook)

@@ -119,4 +119,36 @@ class MongoImportTest < ActiveSupport::TestCase
     def dump(collection, *documents)
       File.binwrite(@dir.join("#{collection}.bson"), documents.map { |doc| doc.to_bson.to_s }.join)
     end
+
+
+  test "the report lists the counts and groups what was skipped by reason" do
+    dump("mealPlans",
+      { _id: BSON::ObjectId.new, user_id: @collin.to_s, recipe_id: BSON::ObjectId.new.to_s, date: "2026-04-06" },
+      { _id: BSON::ObjectId.new, user_id: @collin.to_s, recipe_id: BSON::ObjectId.new.to_s, date: "2026-04-07" })
+
+    text = MongoImport.new(@dir, images: false).run.to_s
+
+    assert_match(/^2 users$/, text)
+    assert_match(/^skipped 2x a planned meal \(recipe was deleted\)$/, text)
+  end
+
+  test "a photo address that can't be fetched leaves the recipe without one" do
+    dump("recipes", { _id: @recipe, user_id: @collin.to_s, recipe_name: "Ramen", image_url: "https://example.com/gone.jpg", ingredients: [] })
+    refuse = ->(*) { raise RemoteFetch::Refused, "no" }
+
+    RemoteFetch.stub(:get, refuse) { MongoImport.new(@dir).run }
+
+    assert_not Recipe.find_by!(name: "Ramen").image.attached?
+  end
+
+  test "a photo address that isn't a web address is ignored" do
+    dump("recipes", { _id: @recipe, user_id: @collin.to_s, recipe_name: "Ramen", image_url: "not a url at all", ingredients: [] })
+    uploads = Pathname(Dir.mktmpdir)
+
+    MongoImport.new(@dir, uploads:).run
+
+    assert_not Recipe.find_by!(name: "Ramen").image.attached?
+  ensure
+    FileUtils.remove_entry(uploads) if uploads
+  end
 end

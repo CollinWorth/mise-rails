@@ -1,8 +1,4 @@
 class Views::Recipes::Show < Views::Base
-  # Times and servings use the palette's secondary color; cuisine, category and rating use its tertiary one.
-  SECONDARY_BADGE = "border-brand-2/30 bg-brand-2/10 text-brand-2".freeze
-  TERTIARY_BADGE = "border-brand-3/30 bg-brand-3/10 text-brand-3".freeze
-
   def initialize(recipe:, scale: Scale.default)
     @recipe = recipe
     @scale = scale
@@ -49,12 +45,13 @@ class Views::Recipes::Show < Views::Base
 
     def facts
       Row(gap: :sm) do
-        Badge(variant: :outline, class: SECONDARY_BADGE) { "Prep #{@recipe.prep_time} min" } if @recipe.prep_time
-        Badge(variant: :outline, class: SECONDARY_BADGE) { "Cook #{@recipe.cook_time} min" } if @recipe.cook_time
-        Badge(variant: :outline, class: SECONDARY_BADGE) { "Serves #{Quantity.format(@recipe.servings * @scale.factor)}" } if @recipe.servings
-        Badge(variant: :outline, class: TERTIARY_BADGE) { @recipe.cuisine } if @recipe.cuisine.present?
-        Badge(variant: :outline, class: TERTIARY_BADGE) { @recipe.category } if @recipe.category.present?
-        Badge(variant: :outline, class: TERTIARY_BADGE) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
+        # times and servings in the theme's secondary color; cuisine, category and rating in its tertiary one
+        Tag { "Prep #{@recipe.prep_time} min" } if @recipe.prep_time
+        Tag { "Cook #{@recipe.cook_time} min" } if @recipe.cook_time
+        Tag { "Serves #{Quantity.format(@recipe.servings * @scale.factor)}" } if @recipe.servings
+        Tag(tone: :tertiary) { @recipe.cuisine } if @recipe.cuisine.present?
+        Tag(tone: :tertiary) { @recipe.category } if @recipe.category.present?
+        Tag(tone: :tertiary) { "★ #{@recipe.average_rating}" } if @recipe.average_rating
       end
     end
 
@@ -94,10 +91,7 @@ class Views::Recipes::Show < Views::Base
               if ingredient.section?
                 Heading(level: 4, class: "mt-2 text-sm uppercase tracking-wide text-brand-3") { ingredient.name }
               else
-                label(class: "flex cursor-pointer items-start gap-3 py-0.5 has-[:checked]:text-muted-foreground has-[:checked]:line-through") do
-                  Checkbox(value: "i#{ingredient.id}", class: "mt-1.5", data: { checklist_target: "item", action: "change->checklist#save" })
-                  span { ingredient.to_line(@scale.factor) }
-                end
+                ChecklistItem(value: "i#{ingredient.id}") { ingredient.to_line(@scale.factor) }
               end
             end
           end
@@ -145,8 +139,8 @@ class Views::Recipes::Show < Views::Base
         Stack(gap: :sm, class: "min-w-0 flex-1") do
           Row(gap: :sm, justify: :between) do
             Row(gap: :sm) do
-              span(class: "text-sm font-medium") { comment.user.name }
-              span(class: "text-xs text-muted-foreground") { "#{view_context.time_ago_in_words(comment.created_at)} ago" }
+              Text(as: "span", size: "2", weight: "medium") { comment.user.name }
+              Text(as: "span", size: "1", class: "text-muted-foreground") { "#{view_context.time_ago_in_words(comment.created_at)} ago" }
             end
             ButtonTo(action: recipe_comment_path(@recipe, comment), method: :delete, variant: :ghost, button_class: "h-auto px-1 py-0 text-xs text-muted-foreground") { "Delete" } if comment.user == Current.user
           end

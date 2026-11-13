@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class SignInTest < ApplicationSystemTestCase
+class SignInSystemTest < ApplicationSystemTestCase
   test "signing in and out" do
     user = create_user(name: "Maria")
 

@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class RecipeFormTest < ApplicationSystemTestCase
+class RecipeFormSystemTest < ApplicationSystemTestCase
   test "adding and removing ingredient rows" do
     cook = create_user(name: "Maria")
     sign_in_through_form(cook)

@@ -1,4 +1,13 @@
 ENV["RAILS_ENV"] ||= "test"
+
+if ENV["COVERAGE"]
+  require "simplecov"
+  SimpleCov.start "rails" do
+    command_name "tests-#{SecureRandom.hex(4)}"
+    add_filter "app/components/ruby_ui/" # vendored library components
+  end
+end
+
 require_relative "../config/environment"
 require "rails/test_help"
 require "minitest/mock"

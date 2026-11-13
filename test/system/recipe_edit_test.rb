@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class RecipeEditTest < ApplicationSystemTestCase
+class RecipeEditSystemTest < ApplicationSystemTestCase
   setup do
     @cook = create_user(name: "Maria")
     @recipe = attach_image create_recipe(@cook, name: "Toast", ingredients: [ { name: "bread" } ])

@@ -54,4 +54,23 @@ class IconsTest < ActionDispatch::IntegrationTest
     assert_includes svg, "<svg"
     assert_includes svg, "linearGradient"
   end
+
+
+  test "icons:generate draws every icon at its size from the one logo" do
+    require "rake"
+    Rails.application.load_tasks unless Rake::Task.task_defined?("icons:generate")
+
+    Dir.mktmpdir do |dir|
+      ENV["OUTPUT"] = dir
+      capture_io { Rake::Task["icons:generate"].execute }
+
+      { "apple-touch-icon.png" => 180, "favicon-32.png" => 32, "icon-192.png" => 192, "icon.png" => 512, "icon-maskable-512.png" => 512 }.each do |name, size|
+        assert_equal [ size, size ], Pathname(dir).join(name).binread(24)[16, 8].unpack("NN"), name
+      end
+      assert_includes Pathname(dir).join("icon.svg").read, "linearGradient"
+      assert_equal [ 0, 1, 1 ], Pathname(dir).join("favicon.ico").binread(6).unpack("vvv")
+    end
+  ensure
+    ENV.delete("OUTPUT")
+  end
 end

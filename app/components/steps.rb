@@ -10,7 +10,7 @@ class Components::Steps < Components::Base
         li do
           label(class: "group flex cursor-pointer gap-4") do
             input(type: :checkbox, value: "s#{index}", class: "peer sr-only", data: { checklist_target: "item", action: "change->checklist#save" })
-            span(class: "flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-2 text-sm font-semibold text-brand-2-foreground transition group-has-[:checked]:bg-muted group-has-[:checked]:text-muted-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring") do
+            NumberBadge(class: "transition group-has-[:checked]:bg-muted group-has-[:checked]:text-muted-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring") do
               span(class: "group-has-[:checked]:hidden") { index + 1 }
               Icon(:check, class: "hidden size-4 group-has-[:checked]:block")
             end

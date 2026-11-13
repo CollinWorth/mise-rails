@@ -1,7 +1,7 @@
 require "application_system_test_case"
 
 # Turbo is what decides how a form response is shown, so the import is tested in a browser.
-class RecipeImportTest < ApplicationSystemTestCase
+class RecipeImportSystemTest < ApplicationSystemTestCase
   setup do
     @cook = create_user(name: "Maria")
     sign_in_through_form(@cook)

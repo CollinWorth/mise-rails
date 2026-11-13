@@ -1,77 +1,63 @@
 source "https://rubygems.org"
 
-# Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+ruby file: ".ruby-version"
+
+# --- Rails and the web server ---
 gem "rails", "~> 8.1.4", ">= 8.1.4.1"
-# The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
-# Postgres in production; SQLite for local development and tests
-gem "pg", "~> 1.5"
-gem "sqlite3", ">= 2.1", group: %i[ development test ]
-# Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
-gem "importmap-rails"
-# Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
-gem "turbo-rails"
-# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
-gem "stimulus-rails"
-# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
-gem "tailwindcss-rails"
-
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-gem "bcrypt", "~> 3.1.7"
-
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem "tzinfo-data", platforms: %i[ windows jruby ]
-
+# HTTP asset caching and compression in front of Puma, as in the production Dockerfile
+gem "thruster", require: false
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
+# Windows does not include zoneinfo files
+gem "tzinfo-data", platforms: %i[ windows jruby ]
 
-# Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
-gem "kamal", require: false
+# --- Database: Postgres in production, SQLite for local development and tests ---
+gem "pg", "~> 1.5"
+gem "sqlite3", ">= 2.1", group: %i[ development test ]
 
-# Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
-gem "thruster", require: false
-
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
-# S3-compatible bucket for Active Storage in production
-gem "aws-sdk-s3", "~> 1.0", require: false
-
-group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
-
-  # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
-  gem "bundler-audit", require: false
-
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
-
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
-  gem "rubocop-rails-omakase", require: false
-end
-
-group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
-  gem "web-console"
-end
-
+# --- Front end: Hotwire, Tailwind, and Phlex views built from RubyUI components ---
+gem "importmap-rails"
+gem "turbo-rails"
+gem "stimulus-rails"
+gem "tailwindcss-rails"
 gem "phlex-rails", "~> 2.4"
 # refract (a Phlex dependency) still uses Prism::MissingNode, which Prism 2 removed
 gem "prism", "< 2"
-
+gem "tailwind_merge", "~> 1.5"
+# Only used to copy components in (bin/rails g ruby_ui:component ...); the copies live in app/components/ruby_ui
 gem "ruby_ui", "~> 1.6", group: :development
 
-gem "tailwind_merge", "~> 1.5"
-
+# --- Accounts, uploads and data ---
+gem "bcrypt", "~> 3.1.7"
+gem "image_processing", "~> 1.2"
+# S3-compatible bucket for Active Storage in production
+gem "aws-sdk-s3", "~> 1.0", require: false
+gem "pagy", "~> 43.8"
+# Parses ingredient quantities
 gem "ingreedy", "~> 0.1.0"
 # Reads the old Mongo dump (bin/rails import:mongo)
 gem "bson", "~> 5.0", require: false
 
-gem "pagy", "~> 43.8"
+group :development, :test do
+  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
+  gem "bundler-audit", require: false
+  # Static analysis for security vulnerabilities
+  gem "brakeman", require: false
+  # Omakase Ruby styling
+  gem "rubocop-rails-omakase", require: false
+end
 
-gem "capybara", "~> 3.40", group: :test
-gem "selenium-webdriver", "~> 4.52", group: :test
+group :development do
+  gem "web-console"
+end
 
-gem "minitest-mock", "~> 5.27", group: :test
+group :test do
+  gem "capybara", "~> 3.40"
+  gem "selenium-webdriver", "~> 4.52"
+  gem "minitest-mock", "~> 5.27"
+  # Coverage report: COVERAGE=1 bin/rails test
+  gem "simplecov", require: false
+end

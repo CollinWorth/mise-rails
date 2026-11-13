@@ -24,7 +24,7 @@ class Views::PlannedMeals::Index < Views::Base
               CardTitle { date.strftime("%A") }
               CardDescription { date.strftime("%b %-d") }
             end
-            Badge(variant: :outline, class: "border-brand-3/30 bg-brand-3/10 text-brand-3") { "Today" } if today
+            Tag(tone: :tertiary) { "Today" } if today
           end
         end
         CardContent do

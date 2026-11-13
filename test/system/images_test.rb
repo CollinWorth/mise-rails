@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class ImagesTest < ApplicationSystemTestCase
+class ImagesSystemTest < ApplicationSystemTestCase
   test "a recipe card opens the recipe from anywhere on the card, and a recipe without a photo gets an initial tile" do
     cook = create_user(name: "Maria")
     create_recipe(cook, name: "Greek Salad")

@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class LandingTest < ApplicationSystemTestCase
+class LandingSystemTest < ApplicationSystemTestCase
   setup do
     cook = create_user(name: "Maria")
     4.times { |n| attach_image create_recipe(cook, name: "Dish #{n}") }

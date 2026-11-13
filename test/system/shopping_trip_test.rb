@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class ShoppingTripTest < ApplicationSystemTestCase
+class ShoppingTripSystemTest < ApplicationSystemTestCase
   setup do
     @cook = create_user(name: "Maria")
     @monday = Date.current.beginning_of_week

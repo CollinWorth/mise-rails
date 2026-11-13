@@ -82,4 +82,37 @@ class RecipesTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_recipes_import_path
     assert_response :see_other
   end
+
+  test "a recipe without a name isn't saved and the form shows why" do
+    sign_in @user
+
+    assert_no_difference "Recipe.count" do
+      post recipes_path, params: { recipe: { name: "", instructions: "Boil" } }
+    end
+
+    assert_response :unprocessable_content
+    assert_select "[role=alert]", text: /Name can't be blank/
+  end
+
+  test "editing a recipe into an invalid one keeps the old version" do
+    sign_in @user
+    recipe = create_recipe(@user, name: "Soup")
+
+    patch recipe_path(recipe), params: { recipe: { name: "" } }
+
+    assert_response :unprocessable_content
+    assert_equal "Soup", recipe.reload.name
+  end
+
+  test "a recipe page lists the public versions other cooks made of it" do
+    sign_in @user
+    original = create_recipe(@user, name: "Soup")
+    version = create_recipe(@other, name: "Better Soup")
+    version.update!(original:, modified: true)
+
+    get recipe_path(original)
+
+    assert_select "h3", text: "Versions by other cooks"
+    assert_select "a", text: "Better Soup"
+  end
 end

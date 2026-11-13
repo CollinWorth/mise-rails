@@ -6,11 +6,4 @@ class Components::Base < Phlex::HTML
   include Phlex::Rails::Helpers::Routes
 
   register_element :turbo_frame
-
-  if Rails.env.development?
-    def before_template
-      comment { "Before #{self.class.name}" }
-      super
-    end
-  end
 end

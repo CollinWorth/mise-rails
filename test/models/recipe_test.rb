@@ -96,4 +96,32 @@ class RecipeTest < ActiveSupport::TestCase
     assert_equal "Toast it.\nButter it.", recipe.reload.instructions
     assert_equal [ "Toast it.", "Butter it." ], recipe.steps
   end
+
+
+  test "a photo that can't be downloaded doesn't stop the recipe being saved" do
+    refuse = ->(*) { raise RemoteFetch::Refused, "no" }
+    recipe = RemoteFetch.stub(:get, refuse) { @author.recipes.create!(name: "No photo", image_url: "https://example.com/p.jpg") }
+
+    assert recipe.persisted?
+    assert_not recipe.image.attached?
+  end
+
+  test "a photo address is downloaded and attached when the recipe is created" do
+    photo = Struct.new(:body, :content_type).new(file_fixture("dish.jpg").binread, "image/jpeg")
+    recipe = RemoteFetch.stub(:get, photo) { @author.recipes.create!(name: "Photo", image_url: "https://example.com/dish.jpg") }
+
+    assert recipe.image.attached?
+    assert_equal "dish.jpg", recipe.image.filename.to_s
+  end
+
+  test "editing a saved copy marks it as modified, and editing an original does not" do
+    copy = @recipe.copy_for(@reader).tap(&:save!)
+    assert_not copy.modified?
+
+    copy.update!(instructions: "Changed")
+    assert copy.reload.modified?
+
+    @recipe.update!(instructions: "Edited")
+    assert_not @recipe.reload.modified?
+  end
 end

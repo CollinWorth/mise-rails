@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class ReactionsTest < ApplicationSystemTestCase
+class ReactionsSystemTest < ApplicationSystemTestCase
   setup do
     @recipe = create_recipe(create_user(name: "Maria"), name: "Greek Salad")
     sign_in_through_form(create_user(name: "Sam"))
