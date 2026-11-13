@@ -151,4 +151,36 @@ class MongoImportTest < ActiveSupport::TestCase
   ensure
     FileUtils.remove_entry(uploads) if uploads
   end
+
+  # --- the import:mongo task around it ---
+
+  def run_task(env = {})
+    require "rake"
+    Rails.application.load_tasks unless Rake::Task.task_defined?("import:mongo")
+    old = env.keys.to_h { |key| [ key, ENV[key] ] }
+    env.each { |key, value| ENV[key] = value }
+    Rake::Task["import:mongo"].reenable
+    capture_io { Rake::Task["import:mongo"].invoke }.first
+  ensure
+    old.each { |key, value| value ? ENV[key] = value : ENV.delete(key) }
+  end
+
+  test "the task needs a dump folder, and a real one" do
+    assert_raises(SystemExit) { run_task("DIR" => nil) }
+    assert_raises(SystemExit) { run_task("DIR" => "/no/such/folder") }
+  end
+
+  test "the task prints what it loaded" do
+    output = run_task("DIR" => @dir.to_s, "IMAGES" => "0")
+
+    assert_match(/^2 users$/, output)
+    assert_equal 2, User.count
+  end
+
+  test "in production the task won't wipe anything without CONFIRM=wipe" do
+    Rails.stub(:env, ActiveSupport::StringInquirer.new("production")) do
+      assert_raises(SystemExit) { run_task("DIR" => @dir.to_s, "CONFIRM" => nil) }
+    end
+    assert_equal 0, User.count
+  end
 end
