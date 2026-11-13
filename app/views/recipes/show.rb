@@ -61,18 +61,18 @@ class Views::Recipes::Show < Views::Base
     def cooked_summary
       return unless latest_cooking
 
-      Text(size: "2", class: "text-muted-foreground") { "Cooked #{cooked_count} #{'time'.pluralize(cooked_count)} · last #{day_words(latest_cooking.cooked_at)}" }
+      Text(size: "2", class: "text-muted-foreground") { "Cooked #{cooked_count} #{'time'.pluralize(cooked_count)} · last #{day_words(latest_cooking.cooked_on)}" }
     end
 
     # The log button at the end of the steps; once pressed it turns into a confirmation with an undo.
     def cooked_button
       return unless Current.user
 
-      if latest_cooking&.cooked_at&.to_date == Date.current
+      if latest_cooking&.cooked_on == Date.current
         Row(justify: :between, class: "rounded-xl border bg-brand-2/10 p-3") do
           Row(gap: :sm) do
             Icon(:check, class: "size-5 text-brand-2")
-            Text(weight: "medium") { "Cooked today at #{latest_cooking.cooked_at.strftime('%-l:%M %P')}" }
+            Text(weight: "medium") { "Cooked today" }
           end
           ButtonTo(action: recipe_cooking_path(@recipe), method: :delete, variant: :ghost) { "Undo" } if latest_cooking.undoable?
         end
@@ -90,11 +90,11 @@ class Views::Recipes::Show < Views::Base
 
     def cooked_count = Current.user.cookings.where(recipe: @recipe).count
 
-    def day_words(time)
-      case time.to_date
+    def day_words(date)
+      case date
       when Date.current then "today"
       when Date.current - 1 then "yesterday"
-      else "on #{time.strftime('%b %-d')}"
+      else "on #{date.strftime('%b %-d')}"
       end
     end
 

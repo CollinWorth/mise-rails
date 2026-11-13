@@ -27,14 +27,14 @@ class CookingsTest < ActionDispatch::IntegrationTest
 
     get recipe_path(@soup)
     assert_select "button", text: "I cooked this", count: 0
-    assert_select "p", text: /Cooked today at/
+    assert_select "p", text: "Cooked today"
     assert_select "p", text: "Cooked 1 time · last today"
     assert_select "form[action=?] button", recipe_cooking_path(@soup), text: "Undo"
   end
 
   test "cooking it again later counts up" do
-    @cook.cookings.create!(recipe: @soup, cooked_at: 3.days.ago)
-    @cook.cookings.create!(recipe: @soup, cooked_at: 2.days.ago)
+    @cook.cookings.create!(recipe: @soup, cooked_on: Date.current - 3)
+    @cook.cookings.create!(recipe: @soup, cooked_on: Date.current - 2)
 
     get recipe_path(@soup)
     assert_select "p", text: /Cooked 2 times · last on /
@@ -45,7 +45,7 @@ class CookingsTest < ActionDispatch::IntegrationTest
   end
 
   test "undo takes back the latest cooking only, and only a recent one" do
-    older = @cook.cookings.create!(recipe: @soup, cooked_at: 2.days.ago)
+    older = @cook.cookings.create!(recipe: @soup, cooked_on: Date.current - 2)
     latest = @cook.cookings.create!(recipe: @soup)
 
     delete recipe_cooking_path(@soup)

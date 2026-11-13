@@ -6,11 +6,11 @@ class CookingTest < ActiveSupport::TestCase
     @recipe = create_recipe(@cook, name: "Soup")
   end
 
-  test "it remembers the recipe's name and the time without being told" do
+  test "it remembers the recipe's name and today's date without being told" do
     cooking = @cook.cookings.create!(recipe: @recipe)
 
     assert_equal "Soup", cooking.recipe_name
-    assert_in_delta Time.current, cooking.cooked_at, 5
+    assert_equal Date.current, cooking.cooked_on
   end
 
   test "the history survives the recipe being renamed or deleted" do
@@ -32,8 +32,8 @@ class CookingTest < ActiveSupport::TestCase
   end
 
   test "newest comes first, and only a recent cooking can be undone" do
-    old = @cook.cookings.create!(recipe: @recipe, cooked_at: 3.days.ago)
-    recent = @cook.cookings.create!(recipe: @recipe, cooked_at: 1.hour.ago)
+    old = @cook.cookings.create!(recipe: @recipe, cooked_on: Date.current - 3)
+    recent = @cook.cookings.create!(recipe: @recipe, cooked_on: Date.current)
 
     assert_equal [ recent, old ], @cook.cookings.newest.to_a
     assert recent.undoable?
