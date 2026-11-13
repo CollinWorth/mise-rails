@@ -11,10 +11,11 @@ class MongoImportTest < ActiveSupport::TestCase
     dump("recipes",
       { _id: @recipe, user_id: @collin.to_s, recipe_name: "Ramen", instructions: "Boil.\nServe.", prep_time: 5, cook_time: nil, servings: 2, cuisine: "Japanese", category: "", tags: "quick",
         is_public: true, is_modified: nil, original_recipe_id: "", image_url: "https://example.com/ramen.jpg",
-        ingredients: [ { name: "Noodles", quantity: "200", unit: "g" }, { name: "  ", quantity: "", unit: "" }, { name: "Egg", quantity: "1", unit: "" } ] },
+        ingredients: [ { name: "For the broth", is_section: true }, { name: "Noodles", quantity: "200", unit: "g", is_section: false }, { name: "  ", quantity: "", unit: "" }, { name: "Egg", quantity: "1", unit: "" }, "Scallions" ] },
       { _id: @copy, user_id: @maria.to_s, recipe_name: "Ramen", is_public: false, is_modified: true, original_recipe_id: @recipe.to_s, ingredients: [] },
       { _id: BSON::ObjectId.new, user_id: "f" * 24, recipe_name: "Orphan", ingredients: [] })
     dump("comments", { _id: BSON::ObjectId.new, recipe_id: @recipe.to_s, user_id: @maria.to_s, text: "Tasty", parent_id: nil, created_at: Time.utc(2026, 4, 9) })
+    dump("ratings", { _id: BSON::ObjectId.new, recipe_id: @recipe.to_s, user_id: @maria.to_s, rating: 2 }, { _id: BSON::ObjectId.new, recipe_id: @recipe.to_s, user_id: @maria.to_s, rating: 3 })
     dump("follows", { _id: BSON::ObjectId.new, follower_id: @maria.to_s, following_id: @collin.to_s })
     dump("mealPlans",
       { _id: BSON::ObjectId.new, user_id: @collin.to_s, recipe_id: @recipe.to_s, date: "2026-04-05", multiplier: 2 },
@@ -36,7 +37,9 @@ class MongoImportTest < ActiveSupport::TestCase
     ramen = Recipe.find_by!(name: "Ramen", user: User.first)
     assert ramen.public?
     assert_nil ramen.category
-    assert_equal [ "Noodles", "Egg" ], ramen.ingredients.map(&:name)
+    assert_equal [ "For the broth", "Noodles", "Egg", "Scallions" ], ramen.ingredients.map(&:name)
+    assert_equal [ true, false, false, false ], ramen.ingredients.map(&:section)
+    assert_equal [ 2 ], ramen.ratings.pluck(:value), "a second rating by the same person is dropped"
     assert_equal 1, Comment.count
     assert_equal Time.utc(2026, 4, 9), Comment.first.created_at
     assert_equal [ [ User.second.id, User.first.id ] ], Follow.pluck(:follower_id, :followed_id)
@@ -90,7 +93,7 @@ class MongoImportTest < ActiveSupport::TestCase
   test "photos uploaded to the old server come from its uploads folder" do
     uploads = Pathname(Dir.mktmpdir)
     FileUtils.cp(file_fixture("dish.jpg"), uploads.join("abc.jpg"))
-    dump("recipes", { _id: @recipe, user_id: @collin.to_s, recipe_name: "Ramen", image_url: "http://100.1.2.3:8000/uploads/abc.jpg", ingredients: [] })
+    dump("recipes", { _id: @recipe, user_id: @collin.to_s, recipe_name: "Ramen", image_url: "https://old.example.com/api/uploads/abc.jpg", ingredients: [] })
 
     MongoImport.new(@dir, uploads:).run
 

@@ -5,7 +5,10 @@ require "bson"
 # Run it with `bin/rails import:mongo DIR=...`; it replaces everything in the target database.
 class MongoImport
   Report = Data.define(:counts, :skipped) do
-    def to_s = (counts.map { |name, count| "#{count} #{name}" } + skipped.map { |reason| "skipped: #{reason}" }).join("\n")
+    def to_s
+      grouped = skipped.group_by { |reason| reason.sub(/ on \d{4}-\d\d-\d\d/, "") }.map { |reason, all| "skipped #{all.size}x #{reason}" }
+      (counts.map { |name, count| "#{count} #{name}" } + grouped).join("\n")
+    end
   end
 
   def initialize(dir, uploads: nil, images: true)
@@ -23,6 +26,7 @@ class MongoImport
       import_users
       import_recipes
       link_copies
+      import_ratings
       import_comments
       import_follows
       import_planned_meals
@@ -38,7 +42,7 @@ class MongoImport
     end
 
     def counts
-      { users: User, recipes: Recipe, ingredients: Ingredient, "recipe photos": ActiveStorage::Attachment, comments: Comment, follows: Follow, "planned meals": PlannedMeal, "grocery items": GroceryItem }
+      { users: User, recipes: Recipe, ingredients: Ingredient, "recipe photos": ActiveStorage::Attachment, ratings: Rating, comments: Comment, follows: Follow, "planned meals": PlannedMeal, "grocery items": GroceryItem }
         .transform_values(&:count)
     end
 
@@ -58,7 +62,8 @@ class MongoImport
           public: doc["is_public"] == true, modified: doc["is_modified"] == true, created_at: created_at(doc)
         )
         Array(doc["ingredients"]).each_with_index do |row, position|
-          recipe.ingredients.build(name: row["name"].to_s.strip, quantity: row["quantity"].presence, unit: row["unit"].presence, position:) if row["name"].present?
+          row = { "name" => row } unless row.respond_to?(:keys) # very old recipes list plain names
+          recipe.ingredients.build(name: row["name"].to_s.strip, quantity: row["quantity"].presence, unit: row["unit"].presence, section: row["is_section"] == true, position:) if row["name"].present?
         end
         attach_image(recipe, doc["image_url"])
         save(recipe, "recipe #{doc["recipe_name"].inspect}") { @recipes[doc["_id"].to_s] = recipe }
@@ -70,6 +75,15 @@ class MongoImport
       read("recipes").each do |doc|
         original = @recipes[doc["original_recipe_id"].to_s] or next
         @recipes[doc["_id"].to_s]&.update_columns(original_id: original.id)
+      end
+    end
+
+    def import_ratings
+      read("ratings").each do |doc|
+        user, recipe = @users[doc["user_id"].to_s], @recipes[doc["recipe_id"].to_s]
+        next skip("a rating (user or recipe not found)") unless user && recipe
+
+        save(Rating.new(user:, recipe:, value: doc["rating"], created_at: created_at(doc)), "a rating")
       end
     end
 
@@ -122,7 +136,7 @@ class MongoImport
     # Photos uploaded to the old server live in its uploads folder.
     def local_upload(url)
       path = URI.parse(url).path.to_s
-      return unless @uploads && path.start_with?("/uploads/")
+      return unless @uploads && path.match?(%r{\A(/api)?/uploads/})
 
       file = @uploads.join(File.basename(path))
       [ file.binread, Marcel::MimeType.for(file), file.basename.to_s ] if file.file?
