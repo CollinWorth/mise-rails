@@ -97,40 +97,25 @@
   --success-foreground: hsl(0 0% 100%);
 }
 
-/* Color palettes (see Palette). Each one sets seven seed colors for light and for dark: page, text, main color
-   (and the text on it), a soft tint, and a secondary and a tertiary accent. The rule after them derives every
-   token from the seeds, so a new palette is just a block of hex codes. The same selectors also apply to the
-   swatches in the profile picker, which sit inside a data-palette wrapper. */
-[data-palette="ember"] { --p-bg: #ffffff; --p-fg: #1a1410; --p-primary: #c2410c; --p-primary-fg: #ffffff; --p-tint: #f1ddd0; --p-brand2: #0f766e; --p-brand3: #a16207; }
-[data-palette="ember"].dark, .dark [data-palette="ember"] { --p-bg: #0c0a09; --p-fg: #f5efe9; --p-primary: #f97a2b; --p-primary-fg: #1a0e05; --p-tint: #5a2f17; --p-brand2: #2dd4bf; --p-brand3: #fbbf24; }
-
-[data-palette="harvest"] { --p-bg: #fbf5e9; --p-fg: #442d1c; --p-primary: #743014; --p-primary-fg: #fbf5e9; --p-tint: #e8d1a7; --p-brand2: #6a6b2a; --p-brand3: #84592b; }
-[data-palette="harvest"].dark, .dark [data-palette="harvest"] { --p-bg: #1e140d; --p-fg: #f3e6cc; --p-primary: #d9a25f; --p-primary-fg: #1e140d; --p-tint: #84592b; --p-brand2: #bdbd7a; --p-brand3: #e8d1a7; }
-
-[data-palette="ocean"] { --p-bg: #f2f9fb; --p-fg: #0b2a33; --p-primary: #0e7490; --p-primary-fg: #f2f9fb; --p-tint: #bfe6ee; --p-brand2: #be3b4a; --p-brand3: #8a6a12; }
-[data-palette="ocean"].dark, .dark [data-palette="ocean"] { --p-bg: #07161b; --p-fg: #e3f4f8; --p-primary: #38bdf8; --p-primary-fg: #07161b; --p-tint: #164e63; --p-brand2: #fb7185; --p-brand3: #fcd34d; }
-
-[data-palette="plum"] { --p-bg: #fcf6fb; --p-fg: #2b1030; --p-primary: #86198f; --p-primary-fg: #fcf6fb; --p-tint: #ecd3f0; --p-brand2: #3f6212; --p-brand3: #b45309; }
-[data-palette="plum"].dark, .dark [data-palette="plum"] { --p-bg: #1a0b1f; --p-fg: #f6e6f8; --p-primary: #e879f9; --p-primary-fg: #1a0b1f; --p-tint: #581c87; --p-brand2: #a3e635; --p-brand3: #fdba74; }
-
-[data-palette="forest"] { --p-bg: #f6f6ec; --p-fg: #1c2a18; --p-primary: #25401f; --p-primary-fg: #f6f6ec; --p-tint: #c9d2a8; --p-brand2: #b3452b; --p-brand3: #8a6100; }
-[data-palette="forest"].dark, .dark [data-palette="forest"] { --p-bg: #101a0f; --p-fg: #e9eed9; --p-primary: #a3b77f; --p-primary-fg: #101a0f; --p-tint: #3a4d2c; --p-brand2: #f08a6a; --p-brand3: #e7c45a; }
-
-[data-palette="rose"] { --p-bg: #fff7f8; --p-fg: #3b0a17; --p-primary: #be123c; --p-primary-fg: #fff7f8; --p-tint: #fbd0d9; --p-brand2: #0f766e; --p-brand3: #b45309; }
-[data-palette="rose"].dark, .dark [data-palette="rose"] { --p-bg: #1f0a10; --p-fg: #fde8ec; --p-primary: #fb7185; --p-primary-fg: #1f0a10; --p-tint: #6b1a2c; --p-brand2: #5eead4; --p-brand3: #fcd34d; }
-
-[data-palette="indigo"] { --p-bg: #f6f7ff; --p-fg: #14163a; --p-primary: #4338ca; --p-primary-fg: #f6f7ff; --p-tint: #d0d4fb; --p-brand2: #047857; --p-brand3: #b45309; }
-[data-palette="indigo"].dark, .dark [data-palette="indigo"] { --p-bg: #0d0f24; --p-fg: #e8eaff; --p-primary: #818cf8; --p-primary-fg: #0d0f24; --p-tint: #2f3380; --p-brand2: #34d399; --p-brand3: #fbbf24; }
-
-[data-palette="classic"] { --p-bg: #ffffff; --p-fg: #171717; --p-primary: #171717; --p-primary-fg: #fafafa; --p-tint: #e5e5e5; --p-brand2: #2563eb; --p-brand3: #15803d; }
-[data-palette="classic"].dark, .dark [data-palette="classic"] { --p-bg: #0a0a0a; --p-fg: #fafafa; --p-primary: #fafafa; --p-primary-fg: #171717; --p-tint: #404040; --p-brand2: #60a5fa; --p-brand3: #4ade80; }
+/* Color themes (see Palette). Each is one look for light mode or for dark mode, set with eight seed colors: the page,
+   the cards that sit on it, text, the main color (and the text on it), a soft tint, and a secondary and a tertiary
+   accent. The rule after them derives every other token from the seeds, so a new theme is just a block of hex codes.
+   The same selectors also color the tiles in the profile picker, which sit inside a data-palette wrapper. */
+[data-palette="sunrise"] { --p-bg: #fdeee0; --p-surface: #fffaf5; --p-fg: #2b1a0f; --p-primary: #b93a0a; --p-primary-fg: #fffaf5; --p-tint: #f6cfae; --p-brand2: #0f766e; --p-brand3: #8f5200; }
+[data-palette="meadow"] { --p-bg: #e8f3e1; --p-surface: #f8fcf4; --p-fg: #14301a; --p-primary: #15803d; --p-primary-fg: #f8fcf4; --p-tint: #b9dcae; --p-brand2: #a23b1c; --p-brand3: #6d28d9; }
+[data-palette="lagoon"] { --p-bg: #e1f1f6; --p-surface: #f5fbfd; --p-fg: #0b2a33; --p-primary: #0e7490; --p-primary-fg: #f5fbfd; --p-tint: #b2dce8; --p-brand2: #b4364a; --p-brand3: #7a5c0a; }
+[data-palette="ember"] { --p-bg: #0c0a09; --p-surface: #171311; --p-fg: #f5efe9; --p-primary: #f97a2b; --p-primary-fg: #1a0e05; --p-tint: #5a2f17; --p-brand2: #2dd4bf; --p-brand3: #fbbf24; }
+[data-palette="deepsea"] { --p-bg: #07161b; --p-surface: #0d2229; --p-fg: #e3f4f8; --p-primary: #38bdf8; --p-primary-fg: #07161b; --p-tint: #164e63; --p-brand2: #fb7185; --p-brand3: #fcd34d; }
+[data-palette="gruvbox"] { --p-bg: #fbf1c7; --p-surface: #f9f5d7; --p-fg: #3c3836; --p-primary: #af3a03; --p-primary-fg: #fbf1c7; --p-tint: #ebdbb2; --p-brand2: #076678; --p-brand3: #8f3f71; }
+[data-palette="gruvboxdark"] { --p-bg: #282828; --p-surface: #32302f; --p-fg: #ebdbb2; --p-primary: #fe8019; --p-primary-fg: #282828; --p-tint: #504945; --p-brand2: #8ec07c; --p-brand3: #fabd2f; }
+[data-palette="plum"] { --p-bg: #1a0b1f; --p-surface: #26112d; --p-fg: #f6e6f8; --p-primary: #e879f9; --p-primary-fg: #1a0b1f; --p-tint: #581c87; --p-brand2: #a3e635; --p-brand3: #fdba74; }
 
 [data-palette] {
   --background: var(--p-bg);
   --foreground: var(--p-fg);
-  --card: var(--p-bg);
+  --card: var(--p-surface);
   --card-foreground: var(--p-fg);
-  --popover: var(--p-bg);
+  --popover: var(--p-surface);
   --popover-foreground: var(--p-fg);
   --primary: var(--p-primary);
   --primary-foreground: var(--p-primary-fg);

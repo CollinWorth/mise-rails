@@ -12,7 +12,6 @@ class Components::Navbar < Components::Base
         brand
         links if @user
         div(class: "ml-auto flex items-center gap-1") do
-          theme_toggle
           @user ? account_menu : sign_in_links
         end
       end
@@ -32,13 +31,6 @@ class Components::Navbar < Components::Base
         ITEMS.each do |item|
           Link(href: public_send(item[:path]), variant: current?(item) ? :secondary : :ghost, size: :sm, class: [ "font-medium", ("text-primary" if current?(item)) ], aria: { current: ("page" if current?(item)) }) { item[:label] }
         end
-      end
-    end
-
-    def theme_toggle
-      Button(variant: :ghost, size: :sm, class: "size-9 rounded-full p-0", aria: { label: "Toggle theme" }, data: { controller: "theme", action: "theme#toggle" }) do
-        Icon(:moon, class: "dark:hidden")
-        Icon(:sun, class: "hidden dark:block")
       end
     end
 

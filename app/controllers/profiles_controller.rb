@@ -4,8 +4,8 @@ class ProfilesController < ApplicationController
   end
 
   def update
-    if Current.user.update(params.expect(user: %i[name email_address palette]))
-      redirect_to profile_path, notice: (params[:user].keys == %w[palette] ? "Palette changed." : "Profile updated.")
+    if Current.user.update(params.expect(user: %i[name email_address appearance light_theme dark_theme]))
+      redirect_to profile_path, notice: (params[:user].keys.all? { |key| key.in?(%w[appearance light_theme dark_theme]) } ? "Appearance updated." : "Profile updated.")
     else
       render Views::Profiles::Show.new(user: Current.user), status: :unprocessable_content
     end

@@ -2,11 +2,11 @@ require "test_helper"
 
 class PaletteTest < ActiveSupport::TestCase
   CSS = Rails.root.join("app/assets/tailwind/application.css").read
+  SEEDS = %w[--p-bg --p-brand2 --p-brand3 --p-fg --p-primary --p-primary-fg --p-surface --p-tint].freeze
 
-  # The five seed colors of a palette in light or dark mode, e.g. { "--p-bg" => "#ffffff", ... }
-  def seeds(key, dark:)
-    selector = dark ? %(\\[data-palette="#{key}"\\]\\.dark, \\.dark \\[data-palette="#{key}"\\]) : %(\\[data-palette="#{key}"\\])
-    block = CSS[/^#{selector} \{([^}]*)\}/, 1] or flunk "#{key} has no #{dark ? 'dark' : 'light'} block in application.css"
+  # The seed colors of a theme, e.g. { "--p-bg" => "#ffffff", ... }
+  def seeds(key)
+    block = CSS[/^\[data-palette="#{key}"\] \{([^}]*)\}/, 1] or flunk "#{key} has no block in application.css"
     block.scan(/(--p-[a-z0-9-]+): (#[0-9a-f]{6})/).to_h
   end
 
@@ -19,32 +19,41 @@ class PaletteTest < ActiveSupport::TestCase
     (high + 0.05) / (low + 0.05)
   end
 
-  test "the default is one of the palettes, and unknown keys are rejected" do
-    assert Palette.valid?(Palette::DEFAULT)
-    assert_not Palette.valid?("neon")
-    assert_equal "Autumn Harvest", Palette.name_for("harvest")
-    assert_equal "Ember", Palette.name_for("nonsense")
+  test "there are light and dark themes, each named once" do
+    assert_equal Palette::LIGHT.size + Palette::DARK.size, Palette.all.size
+    assert Palette::LIGHT.size >= 3 && Palette::DARK.size >= 3
+    assert_includes Palette::LIGHT, Palette::DEFAULT_LIGHT
+    assert_includes Palette::DARK, Palette::DEFAULT_DARK
+    assert_includes Palette::APPEARANCES, Palette::DEFAULT_APPEARANCE
   end
 
-  test "every palette has light and dark colors in the stylesheet" do
-    Palette.keys.each do |key|
-      [ false, true ].each do |dark|
-        assert_equal %w[--p-bg --p-brand2 --p-brand3 --p-fg --p-primary --p-primary-fg --p-tint], seeds(key, dark:).keys.sort, "#{key} #{dark ? 'dark' : 'light'}"
-      end
+  test "every theme is defined in the stylesheet with all its colors" do
+    Palette.all.each_key { |key| assert_equal SEEDS, seeds(key).keys.sort, key }
+  end
+
+  test "light themes are light and dark themes are dark, with cards lifted off the page" do
+    Palette::LIGHT.each_key do |key|
+      colors = seeds(key)
+      assert_operator luminance(colors["--p-bg"]), :>, 0.5, "#{key} page"
+      assert_operator luminance(colors["--p-surface"]), :>=, luminance(colors["--p-bg"]), "#{key} cards are lighter than the page"
+    end
+    Palette::DARK.each_key do |key|
+      colors = seeds(key)
+      assert_operator luminance(colors["--p-bg"]), :<, 0.1, "#{key} page"
+      assert_operator luminance(colors["--p-surface"]), :>=, luminance(colors["--p-bg"]), "#{key} cards are lighter than the page"
     end
   end
 
-  test "text and buttons stay readable in every palette" do
-    Palette.keys.each do |key|
-      [ false, true ].each do |dark|
-        colors = seeds(key, dark:)
-        mode = "#{key} #{dark ? 'dark' : 'light'}"
-        assert_operator contrast(colors["--p-fg"], colors["--p-bg"]), :>=, 7, "text on the page in #{mode}"
-        assert_operator contrast(colors["--p-primary-fg"], colors["--p-primary"]), :>=, 4.5, "button text in #{mode}"
-        assert_operator contrast(colors["--p-primary"], colors["--p-bg"]), :>=, 3, "buttons and links against the page in #{mode}"
-        assert_operator contrast(colors["--p-brand2"], colors["--p-bg"]), :>=, 4.5, "secondary color as text in #{mode}"
-        assert_operator contrast(colors["--p-brand3"], colors["--p-bg"]), :>=, 4.5, "tertiary color as text in #{mode}"
+  test "text and buttons stay readable in every theme" do
+    Palette.all.each_key do |key|
+      colors = seeds(key)
+      [ "--p-bg", "--p-surface" ].each do |ground|
+        assert_operator contrast(colors["--p-fg"], colors[ground]), :>=, 7, "text on #{ground} in #{key}"
+        assert_operator contrast(colors["--p-brand2"], colors[ground]), :>=, 4.5, "secondary color as text on #{ground} in #{key}"
+        assert_operator contrast(colors["--p-brand3"], colors[ground]), :>=, 4.5, "tertiary color as text on #{ground} in #{key}"
       end
+      assert_operator contrast(colors["--p-primary-fg"], colors["--p-primary"]), :>=, 4.5, "button text in #{key}"
+      assert_operator contrast(colors["--p-primary"], colors["--p-bg"]), :>=, 3, "buttons and links against the page in #{key}"
     end
   end
 end

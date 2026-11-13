@@ -5,13 +5,28 @@ class Components::Layouts::Application < Components::Base
   include Phlex::Rails::Helpers::StylesheetLinkTag
   include Phlex::Rails::Helpers::JavascriptImportmapTags
 
+  # With "match my device" the browser picks the light or dark theme as the phone does, and follows it when it changes
+  # (a pinned light or dark appearance is already settled when the page is rendered).
+  FOLLOW_DEVICE = <<~JS.squish.freeze
+    (function () {
+      var root = document.documentElement, query = matchMedia("(prefers-color-scheme: dark)");
+      function apply() {
+        if (root.dataset.appearance !== "auto") return;
+        root.classList.toggle("dark", query.matches);
+        root.dataset.palette = query.matches ? root.dataset.darkTheme : root.dataset.lightTheme;
+      }
+      apply();
+      query.addEventListener("change", apply);
+    })();
+  JS
+
   def initialize(user: Current.user)
     @user = user
   end
 
   def view_template(&)
     doctype
-    html(class: Current.theme == "dark" ? "dark" : nil, data: { palette: Current.user&.palette || Palette::DEFAULT }) do
+    html(class: ("dark" if appearance == "dark"), data: { appearance:, light_theme:, dark_theme:, palette: palette }) do
       head do
         title { "Mise" }
         meta(name: "viewport", content: "width=device-width,initial-scale=1,viewport-fit=cover")
@@ -27,6 +42,7 @@ class Components::Layouts::Application < Components::Base
         csrf_meta_tags
         csp_meta_tag
         stylesheet_link_tag "tailwind", data_turbo_track: "reload"
+        script { raw(safe(FOLLOW_DEVICE)) } # before the page paints, so "match my device" never flashes the wrong colors
         javascript_importmap_tags
       end
       body(class: "pb-[calc(env(safe-area-inset-bottom)+5rem)] md:pb-0") do
@@ -42,4 +58,12 @@ class Components::Layouts::Application < Components::Base
       end
     end
   end
+
+  private
+    def appearance = @user&.appearance || Palette::DEFAULT_APPEARANCE
+    def light_theme = @user&.light_theme || Palette::DEFAULT_LIGHT
+    def dark_theme = @user&.dark_theme || Palette::DEFAULT_DARK
+
+    # The theme in use when the page is drawn; "match my device" starts light and the early script corrects it.
+    def palette = appearance == "dark" ? dark_theme : light_theme
 end

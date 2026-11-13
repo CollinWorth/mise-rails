@@ -1,21 +1,16 @@
-# The color palettes people can pick in their profile. The colors themselves are in
-# app/assets/tailwind/palettes.css (seven hex colors per light and dark mode: page, text, main color, a tint, and two accents); this list only names them.
+# The color themes people can pick in their profile: some for light mode, some for dark. The colors themselves are in
+# app/assets/tailwind/application.css (eight hex colors per theme: page, card, text, main color and the text on it,
+# a tint, and two accents); this file only names them.
 # To add one: paste a block in that file and add a line here.
 class Palette
-  DEFAULT = "ember"
+  LIGHT = { "sunrise" => "Sunrise", "meadow" => "Meadow", "lagoon" => "Lagoon", "gruvbox" => "Gruvbox Light" }.freeze
+  DARK = { "ember" => "Ember", "deepsea" => "Deep Sea", "plum" => "Plum", "gruvboxdark" => "Gruvbox Dark" }.freeze
+  APPEARANCES = { "auto" => "Match my device", "light" => "Light", "dark" => "Dark" }.freeze
 
-  NAMES = {
-    "ember" => "Ember",
-    "harvest" => "Autumn Harvest",
-    "ocean" => "Ocean",
-    "plum" => "Plum",
-    "forest" => "Forest",
-    "rose" => "Rose",
-    "indigo" => "Indigo",
-    "classic" => "Classic"
-  }.freeze
+  DEFAULT_LIGHT = "sunrise"
+  DEFAULT_DARK = "ember"
+  DEFAULT_APPEARANCE = "auto"
 
-  def self.keys = NAMES.keys
-  def self.valid?(key) = NAMES.key?(key.to_s)
-  def self.name_for(key) = NAMES.fetch(key.to_s, NAMES.fetch(DEFAULT))
+  def self.all = LIGHT.merge(DARK)
+  def self.dark?(key) = DARK.key?(key)
 end
