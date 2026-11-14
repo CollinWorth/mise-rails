@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_13_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_14_010000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -157,11 +157,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_13_200000) do
 
   create_table "planned_meals", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.integer "recipe_id", null: false
+    t.integer "recipe_id"
     t.date "date", null: false
     t.integer "multiplier", default: 1, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "title"
     t.index ["recipe_id"], name: "index_planned_meals_on_recipe_id"
     t.index ["user_id"], name: "index_planned_meals_on_user_id"
   end

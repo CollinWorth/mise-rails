@@ -13,7 +13,7 @@ class Views::PlannedMeals::Index < Views::Base
     end
     Row(justify: :between) do
       Text(class: "text-muted-foreground") { summary }
-      SheetLink(href: new_grocery_list_meal_plan_path(date: @week_start), variant: :primary) { "Add to grocery list" } if planned.positive?
+      SheetLink(href: new_grocery_list_meal_plan_path(date: @week_start), variant: :primary) { "Add to grocery list" } if recipes_planned?
     end
     DayStrip(week_start: @week_start, planned_dates: @meals.keys)
     Grid(columns: :week) { (0..6).each { |offset| PlannerDay(date: @week_start + offset, meals: @meals.fetch(@week_start + offset, [])) } }
@@ -21,6 +21,9 @@ class Views::PlannedMeals::Index < Views::Base
 
   private
     def planned = @meals.values.sum(&:size)
+
+    # Notes ("Leftovers") count as planned, but only recipes have anything to shop for.
+    def recipes_planned? = @meals.values.flatten.any? { |meal| !meal.note? }
     def current_week? = @week_start == Date.current.beginning_of_week
 
     # "Nov 9 – 15", or "Nov 30 – Dec 6" when the week crosses a month.

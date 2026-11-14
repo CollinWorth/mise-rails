@@ -10,11 +10,15 @@ class PlannedMealsController < ApplicationController
     render_sheet(fallback: planned_meals_path(date: params[:date])) { new_meal_sheet }
   end
 
+  # A recipe (`recipe_id`) or a note (`title`, with no recipe: "Leftovers", "Eating out").
   def create
-    meal = Current.user.planned_meals.build(params.expect(planned_meal: %i[recipe_id date multiplier]))
-    meal.recipe = Recipe.visible_to(Current.user).find(meal.recipe_id)
+    meal = Current.user.planned_meals.build(params.expect(planned_meal: %i[recipe_id title date multiplier]))
+    if meal.recipe_id.present?
+      meal.recipe = Recipe.visible_to(Current.user).find(meal.recipe_id)
+      meal.title = nil
+    end
     meal.save!
-    redirect_back_or_to planned_meals_path(date: meal.date), notice: "Added #{meal.recipe.name} to #{meal.date.strftime('%A')}.", status: :see_other
+    redirect_back_or_to planned_meals_path(date: meal.date), notice: "Added #{meal.note? ? "“#{meal.title}”" : meal.recipe.name} to #{meal.date.strftime('%A')}.", status: :see_other
   end
 
   def destroy

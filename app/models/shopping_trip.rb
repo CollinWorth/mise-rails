@@ -13,7 +13,7 @@ class ShoppingTrip
   end
 
   def meals
-    @meals ||= @user.planned_meals.between(week_start..week_start + 6).includes(recipe: :ingredients).order(:date, :id).to_a
+    @meals ||= @user.planned_meals.with_recipe.between(week_start..week_start + 6).includes(recipe: :ingredients).order(:date, :id).to_a
   end
 
   def selected_meals = @meal_ids ? meals.select { |meal| @meal_ids.include?(meal.id.to_s) } : meals

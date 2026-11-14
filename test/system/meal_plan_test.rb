@@ -149,4 +149,35 @@ class MealPlanSystemTest < ApplicationSystemTestCase
     assert_text "Added 1 item."
     assert_equal "150", @cook.grocery_list.items.find_by(name: "feta").quantity
   end
+
+  test "what you type in the add sheet can be kept as a note, without any recipe" do
+    visit planned_meals_path
+    first(:link, "+ Add", visible: true).click
+    assert_sheet_open
+
+    fill_in "q", with: "Eating at Sam's"
+    click_button "Add “Eating at Sam's” as a note"
+
+    assert_no_selector "[data-controller~=sheet]"
+    assert_text "Added “Eating at Sam's” to Monday"
+    assert_selector "[id^=day-]", text: "Eating at Sam's"
+    assert_equal [ nil, "Eating at Sam's" ], @cook.planned_meals.pluck(:recipe_id, :title).last
+
+    click_button "Remove Eating at Sam's from Monday"
+    assert_no_text "Eating at Sam's"
+    assert_equal 0, @cook.planned_meals.count
+  end
+
+  test "typing a recipe's name offers both the note and the recipe, and the recipe still adds as before" do
+    visit planned_meals_path
+    first(:link, "+ Add", visible: true).click
+    assert_sheet_open
+    fill_in "q", with: "greek"
+
+    assert_button "Add “greek” as a note"
+    click_button "Greek Salad"
+    assert_no_selector "[data-controller~=sheet]"
+    assert_link "Greek Salad"
+    assert_equal @salad, @cook.planned_meals.last.recipe
+  end
 end

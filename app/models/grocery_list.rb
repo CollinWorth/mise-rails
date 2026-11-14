@@ -15,7 +15,7 @@ class GroceryList < ApplicationRecord
   # Adds every ingredient of the given meals, scaling by multiplier and merging
   # with items already on the list.
   def add_meals(planned_meals, only: nil)
-    add_recipes(planned_meals.map { |meal| [ meal.recipe, meal.multiplier, meal.date ] }, only:)
+    add_recipes(planned_meals.select(&:recipe).map { |meal| [ meal.recipe, meal.multiplier, meal.date ] }, only:)
   end
 
   # Same for [recipe, multiplier] or [recipe, multiplier, planned_on] groups, e.g. one recipe at 2x.
