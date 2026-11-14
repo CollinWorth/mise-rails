@@ -7,7 +7,7 @@ class Palette
   DARK = { "ember" => "Ember", "deepsea" => "Deep Sea", "plum" => "Plum", "gruvboxdark" => "Gruvbox Dark" }.freeze
   APPEARANCES = { "auto" => "Match my device", "light" => "Light", "dark" => "Dark" }.freeze
 
-  DEFAULT_LIGHT = "sunrise"
+  DEFAULT_LIGHT = "lagoon"
   DEFAULT_DARK = "ember"
   DEFAULT_APPEARANCE = "auto"
 

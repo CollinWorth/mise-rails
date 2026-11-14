@@ -18,4 +18,12 @@ class UserTest < ActiveSupport::TestCase
       assert_includes user.errors[attribute], "is not included in the list"
     end
   end
+
+  test "a new account starts on the default themes: Lagoon for light, and the device decides which" do
+    user = User.create!(name: "New", email_address: "new@example.com", password: "secret123")
+
+    assert_equal [ "lagoon", "ember", "auto" ], [ user.light_theme, user.dark_theme, user.appearance ]
+    assert_equal "lagoon", Palette::DEFAULT_LIGHT
+    assert_equal Palette::DEFAULT_LIGHT, User.column_defaults["light_theme"], "the database default and the constant agree"
+  end
 end
