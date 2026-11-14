@@ -85,8 +85,9 @@ class ShoppingTripSystemTest < ApplicationSystemTestCase
     assert_no_button "+ olive oil"
 
     fill_in "pantry_item[name]", with: "flour"
+    assert_field "pantry_item[name]", with: "flour" # a refresh from the click before can wipe what was typed; make sure it stuck
     click_button "Add"
-    assert_text "flour"
+    assert_selector "p", text: /\Aflour\z/ # the new row: "flour" is also a suggestion button, so the plain text proves nothing
     assert_field "pantry_item[name]", with: "" # the page has finished refreshing, so the next click lands on the new page
 
     within(:xpath, "//p[normalize-space()='salt']/ancestor::div[contains(@class,'justify-between')][1]") { click_button "Remove" }
