@@ -10,6 +10,6 @@ class UsersController < ApplicationController
   def show
     user = User.find(params[:id])
     pagy, recipes = pagy(:offset, user.recipes.published.newest.with_attached_image.includes(:ratings), limit: 12)
-    render Views::Users::Show.new(user:, recipes:, pagy:)
+    render Views::Users::Show.new(user:, recipes:, pagy:, collections: user.collections.published.newest.to_a)
   end
 end

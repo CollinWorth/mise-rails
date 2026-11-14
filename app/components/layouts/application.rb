@@ -25,17 +25,21 @@ class Components::Layouts::Application < Components::Base
     })();
   JS
 
-  def initialize(user: Current.user, bleed: false, quiet_nav: false)
+  # `meta` describes the page for link previews and the tab title: { title:, description:, image:, url:, noindex: } (all optional;
+  # image and url are absolute, since a previewer fetching them has no site to be relative to).
+  def initialize(user: Current.user, bleed: false, quiet_nav: false, meta: nil)
     @user = user
     @bleed = bleed
     @quiet_nav = quiet_nav
+    @meta = meta || {}
   end
 
   def view_template(&)
     doctype
     html(class: ("dark" if appearance == "dark"), data: { appearance:, light_theme:, dark_theme:, palette: palette }) do
       head do
-        title { "Mise" }
+        title { @meta[:title] ? "#{@meta[:title]} · Mise" : "Mise" }
+        preview_tags if @meta.any?
         meta(name: "viewport", content: "width=device-width,initial-scale=1,viewport-fit=cover")
         meta(name: "theme-color", content: Palette.background(palette), data: { light: Palette.background(light_theme), dark: Palette.background(dark_theme) })
         meta(name: "apple-mobile-web-app-capable", content: "yes")
@@ -74,6 +78,20 @@ class Components::Layouts::Application < Components::Base
   end
 
   private
+    # What a link to this page looks like when pasted into a chat: title, a line about it, and a picture.
+    def preview_tags
+      title = @meta[:title] || "Mise"
+      meta(name: "robots", content: "noindex") if @meta[:noindex]
+      meta(name: "description", content: @meta[:description]) if @meta[:description]
+      meta(property: "og:site_name", content: "Mise")
+      meta(property: "og:type", content: "website")
+      meta(property: "og:title", content: title)
+      meta(property: "og:description", content: @meta[:description]) if @meta[:description]
+      meta(property: "og:url", content: @meta[:url]) if @meta[:url]
+      meta(property: "og:image", content: @meta[:image]) if @meta[:image]
+      meta(name: "twitter:card", content: @meta[:image] ? "summary_large_image" : "summary")
+    end
+
     def appearance = @user&.appearance || Palette::DEFAULT_APPEARANCE
     def light_theme = @user&.light_theme || Palette::DEFAULT_LIGHT
     def dark_theme = @user&.dark_theme || Palette::DEFAULT_DARK

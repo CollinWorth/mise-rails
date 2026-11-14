@@ -4,6 +4,10 @@ class Views::Recipes::Show < Views::Base
     @scale = scale
   end
 
+  def page_meta
+    { title: @recipe.name, description: @recipe.share_blurb, image: share_image(@recipe), url: recipe_url(@recipe), noindex: !@recipe.public? }
+  end
+
   def view_template
     Grid(columns: :hero) do
       RecipeImage(recipe: @recipe, size: :hero, eager: true, class: "rounded-xl")
@@ -41,6 +45,7 @@ class Views::Recipes::Show < Views::Base
         Heading(level: 1) { @recipe.name }
         facts
         cooked_summary
+        collections_summary
         TextLink(href: @recipe.source_url, target: "_blank", rel: "noopener noreferrer", class: "text-sm") { "Source: #{@recipe.source_host}" } if @recipe.source_host
       end
     end
@@ -62,6 +67,19 @@ class Views::Recipes::Show < Views::Base
       return unless latest_cooking
 
       Text(size: "2", class: "text-muted-foreground") { "Cooked #{cooked_count} #{'time'.pluralize(cooked_count)} · last #{day_words(latest_cooking.cooked_on)}" }
+    end
+
+    # The cook's own collections this recipe is in, as links ("In Weeknight, Guests").
+    def collections_summary
+      return unless Current.user
+
+      collections = @recipe.collections.where(user: Current.user).order(:name).to_a
+      return if collections.none?
+
+      Row(gap: :sm, class: "text-sm text-muted-foreground") do
+        Icon(:folder, class: "size-4")
+        collections.each { |collection| TextLink(href: collection_path(collection), class: "text-muted-foreground") { collection.name } }
+      end
     end
 
     # The log button at the end of the steps; once pressed it turns into a confirmation with an undo.
@@ -109,8 +127,9 @@ class Views::Recipes::Show < Views::Base
     def more_menu
       Menu(label: "More actions", align: :start, trigger: -> { span(class: "flex size-10 items-center justify-center rounded-full border") { Icon(:ellipsis) } }) do
         if @recipe.public?
-          MenuItem(icon: :share, hidden: true, data: { controller: "share", action: "share#share", share_title_value: @recipe.name, share_url_value: recipe_url(@recipe) }) { "Share" }
+          MenuItem(icon: :share, data: { controller: "share", action: "share#share", share_title_value: @recipe.name, share_url_value: recipe_url(@recipe) }) { "Share link" }
         end
+        MenuItem(href: recipe_collections_path(@recipe), icon: :folder, data: { turbo_frame: "modal" }) { "Add to a collection" } if Current.user
         if owner?
           MenuItem(href: edit_recipe_path(@recipe), icon: :pencil) { "Edit" }
           MenuItem(action: recipe_path(@recipe), method: :delete, icon: :trash, data: { turbo_confirm: "Delete #{@recipe.name}? This can't be undone." }) { "Delete" }

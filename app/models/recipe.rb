@@ -8,12 +8,16 @@ class Recipe < ApplicationRecord
   has_many :comments, -> { order(:created_at) }, dependent: :destroy
   has_many :planned_meals, dependent: :destroy
   has_many :cookings, dependent: :nullify
+  has_many :collection_recipes, dependent: :destroy
+  has_many :collections, through: :collection_recipes
   has_many :grocery_item_sources, dependent: :nullify
   has_one_attached :image do |attachable|
     # Small WebP versions, made right after upload (and by `bin/rails images:variants` for existing photos) so no one waits on the first view.
     # `format` is a string on purpose: a URL carries it back as a string, and a symbol here would fingerprint differently, so the prepared files would never be found.
     attachable.variant :card, resize_to_fill: [ 640, 360 ], format: "webp", saver: { quality: 78 }, preprocessed: true
     attachable.variant :hero, resize_to_fill: [ 900, 675 ], format: "webp", saver: { quality: 80 }, preprocessed: true
+    # The picture in link previews (iMessage, Slack, ...): a JPEG, which every previewer reads, made the first time one is asked for.
+    attachable.variant :share, resize_to_fill: [ 1200, 630 ], format: "jpeg", saver: { quality: 82 }
   end
 
   accepts_nested_attributes_for :ingredients, allow_destroy: true, reject_if: ->(attrs) { attrs["name"].blank? }
@@ -55,6 +59,13 @@ class Recipe < ApplicationRecord
 
   def liked_by?(user) = likes.exists?(user:)
   def rating_by(user) = rated_recipe.ratings.find_by(user:)&.value
+
+  # One line for a link preview: who, how long, how many, and what's in it.
+  def share_blurb
+    facts = [ cuisine.presence, ("#{total_time} min" if total_time.positive?), ("Serves #{servings}" if servings) ].compact
+    foods = ingredients.reject(&:section?).first(5).map(&:name)
+    [ "By #{user.name}", *facts, ("Made with #{foods.to_sentence(last_word_connector: ' and ')}" if foods.any?) ].join(" · ")
+  end
 
   def source_host = web_uri(source_url)&.host
 

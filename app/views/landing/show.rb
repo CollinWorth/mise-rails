@@ -7,6 +7,11 @@ class Views::Landing::Show < Views::Base
     @dinners = dinners
   end
 
+  def page_meta
+    { title: "Dinner, decided", description: "Save recipes from anywhere, plan the week, and shop from one list that already knows your pantry.",
+      image: absolute_url("/icon.png"), url: root_url }
+  end
+
   def bleed? = true
   def quiet_nav? = true
 

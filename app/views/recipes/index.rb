@@ -7,6 +7,7 @@ class Views::Recipes::Index < Views::Base
 
   def view_template
     PageHeader(title: "My recipes") do
+      Link(href: collections_path, variant: :outline) { "Collections" }
       Link(href: new_recipes_import_path, variant: :outline) { "Import" }
       Link(href: new_recipe_path, variant: :primary) { "New recipe" }
     end

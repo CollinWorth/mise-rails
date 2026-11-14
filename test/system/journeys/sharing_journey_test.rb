@@ -46,8 +46,17 @@ class SharingJourneySystemTest < JourneyTestCase
     click_link "Following"
     assert_link "Lentil Stew", exact: true
 
-    # --- save a copy to his own recipes, plan it and cook it
+    # --- collect it: start a collection from the recipe's menu
     click_link "Lentil Stew", exact: true, match: :first
+    click_button "More actions"
+    click_link "Add to a collection"
+    assert_sheet_open
+    fill_in "New collection name", with: "Cozy dinners"
+    click_button "Create"
+    assert_text "Added Lentil Stew to Cozy dinners."
+    assert_link "Cozy dinners"
+
+    # --- save a copy to his own recipes, plan it and cook it
     click_button "More actions"
     click_button "Save to my recipes"
     assert_text "Saved from Maria's recipe"
@@ -62,6 +71,16 @@ class SharingJourneySystemTest < JourneyTestCase
 
     tab "Recipes"
     assert_link "Lentil Stew", exact: true
+
+    # --- make the collection public and share it
+    visit collections_path
+    click_link "Cozy dinners"
+    click_link "Edit"
+    check "Public"
+    click_button "Save collection"
+    assert_text "Collection saved."
+    assert_button "Share"
+    assert_link "Lentil Stew"
 
     sam = User.find_by!(email_address: "sam@example.com")
     assert_equal 1, sam.recipes.count
@@ -82,5 +101,12 @@ class SharingJourneySystemTest < JourneyTestCase
 
     visit user_path(maria)
     assert_text "1 followers"
+
+    # --- and Maria can open Sam's public collection from his page, seeing her own recipe in it
+    visit user_path(sam)
+    click_link "Cozy dinners"
+    assert_selector "h1", text: "Cozy dinners"
+    assert_link "Lentil Stew", exact: true
+    assert_no_button "Remove from collection"
   end
 end

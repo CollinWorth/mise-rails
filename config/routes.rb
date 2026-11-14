@@ -24,9 +24,14 @@ Rails.application.routes.draw do
     resources :grocery_items, only: :create, module: :recipes
     resource :like, only: %i[create destroy]
     resource :cooking, only: %i[create destroy] # "I cooked this" and its undo
+    resources :collections, only: :index, module: :recipes # the "add to a collection" sheet
     resource :rating, only: %i[update destroy]
     resource :copy, only: :create
     resources :comments, only: %i[create destroy]
+  end
+
+  resources :collections do
+    resources :recipes, only: %i[create destroy], module: :collections
   end
 
   resources :planned_meals, only: %i[index new create destroy]
