@@ -97,7 +97,7 @@ jobs:
       - name: Run browser tests
         env:
           RAILS_ENV: test
-        run: bin/rails test:system
+        run: bin/ci-browser-tests
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
