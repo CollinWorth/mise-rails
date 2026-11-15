@@ -46,6 +46,13 @@ class GroceryListSystemTest < ApplicationSystemTestCase
     assert_equal [ true ], @cook.grocery_list.items.where(name: "bananas").pluck(:checked)
   end
 
+  test "tapping a item mid-tick again cancels it" do
+    click_button "bananas"
+    click_button "bananas"
+    sleep 1
+    assert_equal [ false ], @cook.grocery_list.items.where(name: "bananas").pluck(:checked)
+  end
+
   test "each row shows the item first and its amount after" do
     row = find("div.group", text: "bananas")
     assert_match(/bananas\s+6/, row.text)

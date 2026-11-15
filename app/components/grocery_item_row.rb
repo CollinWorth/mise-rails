@@ -17,14 +17,19 @@ class Components::GroceryItemRow < Components::Base
 
   private
     def toggle
-      ActionForm(action: grocery_list_item_path(@item), method: :patch, top: true, class: "min-w-0 flex-1") do
+      ActionForm(action: grocery_list_item_path(@item), method: :patch, top: true, class: "min-w-0 flex-1", data: toggle_data) do
         input(type: :hidden, name: "item[checked]", value: @item.checked? ? "0" : "1")
         Button(type: :submit, variant: :ghost, class: "h-auto w-full justify-start gap-3 whitespace-normal px-2 py-2.5 text-left font-normal") do
           CheckCircle(checked: @item.checked?)
-          span(class: [ "min-w-0 flex-1 truncate text-base font-medium", ("text-muted-foreground line-through" if @item.checked?) ]) { @item.name }
+          span(class: [ "check-label min-w-0 flex-1 truncate text-base font-medium", ("text-muted-foreground line-through" if @item.checked?) ]) { @item.name }
           span(class: "shrink-0 text-sm text-muted-foreground") { @item.amount_text }
         end
       end
+    end
+
+    # Ticking waits a moment (see delayed_check_controller.js); un-ticking is instant.
+    def toggle_data
+      { controller: ("delayed-check" unless @item.checked?), action: ("submit->delayed-check#submit" unless @item.checked?) }.compact
     end
 
     def sources_link

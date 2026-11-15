@@ -8,7 +8,7 @@ class Components::CheckCircle < Components::Base
 
   def view_template
     span(class: [ "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition",
-                  (@checked ? "border-brand-2 bg-brand-2 text-brand-2-foreground" : "border-muted-foreground/40"), ("tick-in" if @checked && @animate) ],
+                  (@checked ? "border-brand-2 bg-brand-2 text-brand-2-foreground" : "border-muted-foreground/40 check-fill"), ("tick-in" if @checked && @animate) ],
          style: ("--delay: #{@delay}" if @checked && @animate)) do
       Icon(:check, class: "size-3") if @checked
     end
