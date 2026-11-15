@@ -1,8 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Ticking a grocery line waits a beat while its circle fills in, so a stray tap can be undone by tapping again.
+// Ticking a grocery line waits a beat with its circle filled in, like Apple Reminders,, so a stray tap can be undone by tapping again.
 export default class extends Controller {
-  static values = { delay: { type: Number, default: 700 } }
+  static values = { delay: { type: Number, default: 1000 } }
 
   submit(event) {
     if (this.sending) return
@@ -10,7 +10,6 @@ export default class extends Controller {
     event.preventDefault()
     if (this.timer) return this.cancel()
 
-    this.element.style.setProperty("--fill-time", `${this.delayValue}ms`)
     this.element.dataset.filling = ""
     this.timer = setTimeout(() => {
       this.sending = true
