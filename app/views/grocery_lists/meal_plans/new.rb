@@ -27,9 +27,9 @@ class Views::GroceryLists::MealPlans::New < Views::Base
           input(type: :hidden, name: "date", value: @trip.week_start)
           input(type: :hidden, name: "meal_ids[]", value: "")
           @trip.meals.each do |meal|
-            Row(gap: :sm, class: "flex-nowrap") do
-              Checkbox(id: "meal_#{meal.id}", name: "meal_ids[]", value: meal.id, checked: @trip.selected?(meal))
-              FormFieldLabel(for: "meal_#{meal.id}", class: "min-w-0 flex-1 cursor-pointer truncate", title: meal_label(meal)) { meal_label(meal) }
+            Row(gap: :sm, class: "flex-nowrap items-start py-1") do
+              Checkbox(id: "meal_#{meal.id}", name: "meal_ids[]", value: meal.id, checked: @trip.selected?(meal), class: "mt-0.5 size-5 shrink-0")
+              FormFieldLabel(for: "meal_#{meal.id}", class: "min-w-0 flex-1 cursor-pointer text-base leading-snug") { meal_label(meal) }
             end
           end
         end
