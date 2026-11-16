@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   resource :shortcut_key, only: %i[show create]
   namespace :shortcuts do
     resources :grocery_items, only: :create
+    resources :recipe_imports, only: :create
   end
   resources :password_resets, only: %i[new create edit update], param: :token
 

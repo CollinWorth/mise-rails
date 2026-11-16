@@ -44,10 +44,10 @@ class RecipeImport
 
       {
         source_url: @url.strip,
-        name: data["name"], cuisine: Array(data["recipeCuisine"]).first, category: Array(data["recipeCategory"]).first,
+        name: plain(data["name"]), cuisine: Array(data["recipeCuisine"]).first, category: Array(data["recipeCategory"]).first,
         prep_time: minutes(data["prepTime"]), cook_time: minutes(data["cookTime"]),
         servings: Array(data["recipeYield"]).first.to_s[/\d+/]&.to_i,
-        ingredients: Array(data["recipeIngredient"]).map { |line| CGI.unescapeHTML(line.to_s) },
+        ingredients: Array(data["recipeIngredient"]).map { |line| plain(line).sub(/\A(\d+)\s+and\s+(\d+\/\d+)/i, '\\1 \\2') }.compact_blank,
         instructions: steps(data["recipeInstructions"]).join("\n"),
         image_url: image_url(data["image"])
       }
@@ -56,7 +56,7 @@ class RecipeImport
     # Most recipe sites embed schema.org Recipe data as JSON-LD.
     def recipe_json(document)
       document.css('script[type="application/ld+json"]').each do |script|
-        found = Array.wrap(JSON.parse(script.text)).flat_map { |node| node.is_a?(Hash) ? [ node, *Array.wrap(node["@graph"]) ] : [] }
+        found = Array.wrap(JSON.parse(script.text)).flatten.flat_map { |node| node.is_a?(Hash) ? [ node, *Array.wrap(node["@graph"]).flatten.grep(Hash) ] : [] }
                                                .find { |node| Array(node["@type"]).include?("Recipe") }
         return found if found
       rescue JSON::ParserError
@@ -71,8 +71,11 @@ class RecipeImport
       when Array then node.flat_map { |item| steps(item) }
       when Hash then node["itemListElement"] ? steps(node["itemListElement"]) : [ node["text"] ].compact
       else []
-      end.map { |step| CGI.unescapeHTML(step.to_s.strip) }.compact_blank
+      end.map { |step| plain(step) }.compact_blank
     end
+
+    # Text as people read it: tags dropped, entities (&amp;, &nbsp;) turned into the characters they stand for, spaces tidied.
+    def plain(text) = Nokogiri::HTML.fragment(text.to_s).text.tr(" ", " ").squish
 
     def minutes(duration)
       ActiveSupport::Duration.parse(duration.to_s).in_minutes.to_i if duration.present?

@@ -124,4 +124,19 @@ class RecipeImportTest < ActiveSupport::TestCase
   test "text with nothing to read is a failure" do
     assert_raises(RecipeImport::Failed) { RecipeImport.new(lines: [ { text: " ", role: "step" } ]).attributes }
   end
+
+  test "entities and tags in the page's text become plain text, and non-breaking spaces become spaces" do
+    attributes = import_page({ "@type" => "Recipe", "name" => "Mac &amp; Cheese", "recipeIngredient" => [ "1&nbsp;cup <b>milk</b>", "2 and 3/4 cups flour&nbsp;(spooned &amp; leveled)" ],
+                               "recipeInstructions" => [ { "@type" => "HowToStep", "text" => "Stir&nbsp;well &amp; serve." } ] }.to_json)
+
+    assert_equal "Mac & Cheese", attributes[:name]
+    assert_equal [ "milk", "flour (spooned & leveled)" ], attributes[:ingredients_attributes].map { |line| line[:name] }
+    assert_equal [ "1", "2 3/4" ], attributes[:ingredients_attributes].map { |line| line[:quantity] }
+    assert_equal "Stir well & serve.", attributes[:instructions]
+  end
+
+  test "recipe data is found when the page's JSON-LD holds arrays inside arrays" do
+    attributes = import_page([ [ { "@type" => "WebSite" } ], { "@graph" => [ [ { "@type" => "Recipe", "name" => "Soup", "recipeIngredient" => [ "1 onion" ] } ] ] } ].to_json)
+    assert_equal "Soup", attributes[:name]
+  end
 end
