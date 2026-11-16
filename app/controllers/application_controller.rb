@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Authentication
+  include TimeZoned
   include Pagy::Method
   layout false # views wrap themselves in Components::Layouts::Application
   allow_browser versions: :modern

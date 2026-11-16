@@ -17,11 +17,13 @@ class User < ApplicationRecord
   has_many :followers, through: :follower_follows, source: :follower
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+  normalizes :time_zone, with: ->(name) { name.presence }
 
   validates :name, presence: true
   validates :appearance, inclusion: { in: Palette::APPEARANCES.keys }
   validates :light_theme, inclusion: { in: Palette::LIGHT.keys }
   validates :dark_theme, inclusion: { in: Palette::DARK.keys }
+  validate { errors.add(:time_zone, :inclusion) if time_zone && !ActiveSupport::TimeZone[time_zone] }
   validates :email_address, presence: true, uniqueness: true, format: URI::MailTo::EMAIL_REGEXP
   validates :password, length: { minimum: 6 }, allow_nil: true
 

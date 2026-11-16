@@ -8,6 +8,7 @@ class Views::Sessions::New < Views::Base
             Field(label: "Email", name: "email_address", type: :email, required: true, autofocus: true, autocomplete: "username", autocapitalize: "none", autocorrect: "off")
             Field(label: "Password", name: "password", type: :password, required: true, autocomplete: "current-password")
             Button(type: :submit) { "Sign in" }
+            Link(href: new_password_reset_path) { "Forgot your password?" }
             Link(href: new_registration_path) { "Create an account" }
           end
         end

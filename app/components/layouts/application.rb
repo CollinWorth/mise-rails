@@ -25,6 +25,17 @@ class Components::Layouts::Application < Components::Base
     })();
   JS
 
+  # Tells the server which time zone this device is in (a cookie), for cooks who haven't picked one.
+  TIME_ZONE = <<~JS.squish.freeze
+    (function () {
+      try {
+        var zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (zone && document.cookie.indexOf("time_zone=" + encodeURIComponent(zone)) < 0)
+          document.cookie = "time_zone=" + encodeURIComponent(zone) + "; path=/; max-age=31536000; samesite=lax";
+      } catch (e) {}
+    })();
+  JS
+
   # `meta` describes the page for link previews and the tab title: { title:, description:, image:, url:, noindex: } (all optional;
   # image and url are absolute, since a previewer fetching them has no site to be relative to).
   def initialize(user: Current.user, bleed: false, quiet_nav: false, meta: nil)
@@ -56,6 +67,7 @@ class Components::Layouts::Application < Components::Base
         csrf_meta_tags
         csp_meta_tag
         stylesheet_link_tag "tailwind", data_turbo_track: "reload"
+        script { raw(safe(TIME_ZONE)) }
         script { raw(safe(FOLLOW_DEVICE)) } # before the page paints, so "match my device" never flashes the wrong colors
         javascript_importmap_tags
       end

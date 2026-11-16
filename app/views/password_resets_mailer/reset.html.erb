@@ -1,0 +1,4 @@
+<p>Hi <%= @user.name %>,</p>
+<p>Someone asked to reset the password on your Mise account. If that was you, choose a new one here. The link works for 15 minutes.</p>
+<p><%= link_to "Choose a new password", edit_password_reset_url(@user.password_reset_token) %></p>
+<p>If it wasn't you, ignore this email and your password stays as it is.</p>

@@ -13,6 +13,7 @@ class Views::GroceryLists::Items::Edit < Views::Base
               Field(label: "Quantity", name: "item[quantity]", id: "item_quantity", value: @item.quantity, class: "w-28")
               Field(label: "Unit", name: "item[unit]", id: "item_unit", value: @item.unit, class: "w-28")
             end
+            AisleSelect(item: @item)
             Button(type: :submit) { "Save" }
           end
         end

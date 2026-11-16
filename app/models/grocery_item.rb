@@ -20,9 +20,11 @@ class GroceryItem < ApplicationRecord
   end
 
   private
-    # New items, and renamed ones, go to the aisle their name suggests.
+    # New items go to the aisle their name suggests, and so do renamed ones, unless the item was moved somewhere else by hand.
     def guess_category?
-      category.blank? || category == "other" || (persisted? && name_changed? && !category_changed?)
+      return category.blank? || category == "other" if new_record?
+
+      category.blank? || (name_changed? && !category_changed? && category == self.class.categorize(name_was))
     end
 
     def guess_category

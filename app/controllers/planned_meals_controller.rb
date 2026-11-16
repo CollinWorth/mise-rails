@@ -1,5 +1,7 @@
 class PlannedMealsController < ApplicationController
   def index
+    return month if params[:view] == "month"
+
     week_start = (date_param || Date.current).beginning_of_week
     meals = Current.user.planned_meals.between(week_start..week_start + 6).includes(:recipe).order(:id)
     render Views::PlannedMeals::Index.new(week_start:, meals: meals.group_by(&:date))
@@ -28,6 +30,13 @@ class PlannedMealsController < ApplicationController
   end
 
   private
+    # The whole grid, including the few days of the neighbouring months that fill its first and last weeks.
+    def month
+      month_start = (date_param || Date.current).beginning_of_month
+      shown = month_start.beginning_of_week..month_start.end_of_month.end_of_week
+      render Views::PlannedMeals::Month.new(month_start:, meals: Current.user.planned_meals.between(shown).includes(:recipe).order(:id).group_by(&:date))
+    end
+
     # With a recipe, pick a day for it; otherwise pick a recipe for the day.
     def new_meal_sheet
       if params[:recipe_id].present?

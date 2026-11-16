@@ -180,4 +180,25 @@ class MealPlanSystemTest < ApplicationSystemTestCase
     assert_link "Greek Salad"
     assert_equal @salad, @cook.planned_meals.last.recipe
   end
+
+  test "the month view fits a phone, and tapping a day opens that week" do
+    @cook.planned_meals.create!(recipe: @salad, date: Date.current)
+    visit planned_meals_path
+
+    click_link "Month"
+    assert_selector "h1", text: Date.current.strftime("%B %Y")
+    assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, page.evaluate_script("window.innerWidth")
+
+    find("a[aria-label='#{Date.current.strftime('%A, %B %-d')}, 1 planned']").click
+    assert_link "Greek Salad"
+    assert_current_path planned_meals_path(date: Date.current)
+  end
+
+  test "the month view on a desktop names the meals in each day" do
+    @cook.planned_meals.create!(recipe: @salad, date: Date.current)
+    on_desktop do
+      visit planned_meals_path(view: "month")
+      assert_selector "a", text: "Greek Salad"
+    end
+  end
 end

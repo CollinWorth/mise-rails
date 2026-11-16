@@ -10,6 +10,7 @@ class Components::GroceryItemEditRow < Components::Base
         ActionForm(action: grocery_list_item_path(@item), method: :patch, top: true) do
           Stack(gap: :sm) do
             Input(name: "item[name]", value: @item.name, required: true, autofocus: true, aria: { label: "Item" })
+            AisleSelect(item: @item, id: "item_#{@item.id}_category")
             Row(gap: :sm) do
               Input(name: "item[quantity]", value: @item.quantity, placeholder: "Qty", class: "w-20", aria: { label: "Quantity" })
               Input(name: "item[unit]", value: @item.unit, placeholder: "Unit", class: "w-24", aria: { label: "Unit" })

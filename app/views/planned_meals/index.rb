@@ -12,9 +12,10 @@ class Views::PlannedMeals::Index < Views::Base
       Link(href: planned_meals_path(date: Date.current), variant: :outline) { "Today" } unless current_week?
     end
     Row(justify: :between) do
-      Text(class: "text-muted-foreground") { summary }
+      PlannerViews(date: @week_start + 3, active: :week)
       SheetLink(href: new_grocery_list_meal_plan_path(date: @week_start), variant: :primary) { "Add to grocery list" } if recipes_planned?
     end
+    Text(class: "text-muted-foreground") { summary }
     DayStrip(week_start: @week_start, planned_dates: @meals.keys)
     Grid(columns: :week) { (0..6).each { |offset| PlannerDay(date: @week_start + offset, meals: @meals.fetch(@week_start + offset, [])) } }
   end

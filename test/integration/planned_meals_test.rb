@@ -139,4 +139,40 @@ class PlannedMealsTest < ActionDispatch::IntegrationTest
     post grocery_list_meal_plan_path(date: monday)
     assert_equal [ "lentils" ], @cook.grocery_list.items.map(&:name)
   end
+
+  test "the month view shows the whole month, the meals in it, and links each day to its week" do
+    @cook.planned_meals.create!(recipe: @soup, date: Date.new(2026, 11, 14))
+    @cook.planned_meals.create!(title: "Eating out", date: Date.new(2026, 11, 30))
+    @cook.planned_meals.create!(recipe: @salad, date: Date.new(2026, 12, 20)) # outside the grid
+
+    get planned_meals_path(date: "2026-11-10", view: "month")
+
+    assert_response :success
+    assert_select "h1", text: "November 2026"
+    assert_select "a[href=?]", planned_meals_path(date: Date.new(2026, 11, 14)), text: /Soup/
+    assert_select "a[aria-label='Saturday, November 14, 1 planned']"
+    assert_select "a[aria-label='Monday, November 30, 1 planned']", text: /Eating out/
+    assert_select "a[aria-label='Monday, November 2, nothing planned']" # the grid starts on the Monday before the 1st
+    assert_select "a[aria-label='Sunday, December 6, nothing planned']"
+    assert_no_match(/Greek Salad/, response.body)
+    assert_match(/2 meals planned/, response.body)
+  end
+
+  test "month view moves between months and switches back to the week" do
+    get planned_meals_path(date: "2026-11-10", view: "month")
+    assert_select "a[aria-label='Next month'][href=?]", planned_meals_path(date: Date.new(2026, 12, 1), view: "month")
+    assert_select "a[aria-label='Previous month'][href=?]", planned_meals_path(date: Date.new(2026, 10, 1), view: "month")
+    assert_select "nav a[aria-current=page]", text: "Month"
+    assert_select "nav a[href=?]", planned_meals_path(date: Date.new(2026, 11, 1)), text: "Week"
+
+    get planned_meals_path(date: "2026-11-10")
+    assert_select "nav a[aria-current=page]", text: "Week"
+    assert_select "nav a[href=?]", planned_meals_path(date: Date.new(2026, 11, 12), view: "month"), text: "Month"
+  end
+
+  test "a bad date in the month view falls back to this month" do
+    get planned_meals_path(date: "nonsense", view: "month")
+    assert_response :success
+    assert_select "h1", text: Date.current.strftime("%B %Y")
+  end
 end

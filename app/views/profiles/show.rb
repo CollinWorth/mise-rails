@@ -30,6 +30,14 @@ class Views::Profiles::Show < Views::Base
         CardContent { AppearancePicker(user: @user) }
       end
 
+      Card do
+        CardHeader do
+          CardTitle { "Time zone" }
+          CardDescription { "Decides when a day starts for your planner and \"today\"." }
+        end
+        CardContent { TimeZonePicker(user: @user) }
+      end
+
       ActionForm(action: session_path, method: :delete) { Button(type: :submit, variant: :outline) { "Sign out" } }
 
       Card do

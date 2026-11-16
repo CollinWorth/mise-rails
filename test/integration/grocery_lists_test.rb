@@ -54,6 +54,38 @@ class GroceryListsTest < ActionDispatch::IntegrationTest
     assert_equal 0, @user.grocery_list.items.count
   end
 
+  test "an item can be moved to another aisle, and it stays there when renamed or edited" do
+    post grocery_list_items_path, params: { item: { name: "hot sauce" } }
+    item = @user.grocery_list.items.first
+
+    patch grocery_list_item_path(item), params: { item: { name: "hot sauce", category: "household" } }
+    assert_equal "household", item.reload.category
+
+    patch grocery_list_item_path(item), params: { item: { name: "habanero sauce", quantity: "2" } }
+    assert_equal "household", item.reload.category
+
+    patch grocery_list_item_path(item), params: { item: { name: "habanero sauce", category: "other" } }
+    assert_equal "other", item.reload.category
+  end
+
+  test "an item that was never moved follows its name to a new aisle" do
+    post grocery_list_items_path, params: { item: { name: "bananas" } }
+    item = @user.grocery_list.items.first
+    patch grocery_list_item_path(item), params: { item: { name: "milk" } }
+    assert_equal GroceryItem.categorize("milk"), item.reload.category
+  end
+
+  test "the edit sheet and the in-place edit offer the aisles" do
+    post grocery_list_items_path, params: { item: { name: "bananas" } }
+    item = @user.grocery_list.items.first
+
+    get edit_grocery_list_item_path(item), headers: modal_headers
+    assert_select "select[name='item[category]'] option[selected][value=produce]"
+
+    get edit_grocery_list_item_path(item), headers: { "Turbo-Frame" => "item_#{item.id}" }
+    assert_select "select[name='item[category]'] option", text: "Household"
+  end
+
   test "the edit sheet only renders inside a Turbo Frame" do
     post grocery_list_items_path, params: { item: { name: "bananas" } }
     item = @user.grocery_list.items.first
