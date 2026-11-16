@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   include TimeZoned
   include Pagy::Method
   layout false # views wrap themselves in Components::Layouts::Application
-  allow_browser versions: :modern
+  allow_browser versions: :modern, unless: -> { request.authorization.to_s.start_with?("Bearer ") } # API clients like Shortcuts aren't browsers
   stale_when_importmap_changes
 
   rescue_from ActiveRecord::RecordInvalid do |error|

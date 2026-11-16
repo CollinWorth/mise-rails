@@ -55,6 +55,14 @@ class Views::Profiles::Show < Views::Base
 
       Card do
         CardHeader do
+          CardTitle { "Siri Shortcut" }
+          CardDescription { "Say “Hey Siri, add to grocery list” and what you need goes on your list." }
+        end
+        CardContent { ActionForm(action: shortcut_key_path) { Button(type: :submit, variant: :outline) { "Make my Shortcut key" } } }
+      end
+
+      Card do
+        CardHeader do
           CardTitle { "Delete account" }
           CardDescription { "Removes your account and all of your recipes." }
         end

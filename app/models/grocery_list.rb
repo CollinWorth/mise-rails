@@ -38,7 +38,27 @@ class GroceryList < ApplicationRecord
     Result.new(added:, in_pantry:)
   end
 
+  # Adds what someone said or typed: one item per line or comma ("milk, 2 lb chicken thighs"). A leading amount and unit are
+  # read when there is one. Something already on the list is put back to unchecked instead of added twice. Returns the names.
+  def add_phrases(text)
+    text.to_s.split(/[\n,;]/).filter_map { |phrase| phrase.squish.presence }.first(30).map do |phrase|
+      quantity, unit, name = read_phrase(phrase)
+      item = items.detect { |existing| IngredientName.normalize(existing.name) == IngredientName.normalize(name) }
+      item ? item.update!(checked: false) : items.create!(name:, quantity:, unit:)
+      name
+    end
+  end
+
   private
+    # "2 lb chicken thighs" => ["2", "lb", "chicken thighs"]; "milk" => [nil, nil, "milk"].
+    def read_phrase(phrase)
+      amount, rest = phrase.match(%r{\A(\d+(?:[./]\d+)?(?:\s+\d/\d+)?)\s+(.+)\z})&.captures
+      return [ nil, nil, phrase ] unless amount
+
+      first, remainder = rest.split(" ", 2)
+      remainder.present? && Units.find(first) ? [ amount, first, remainder ] : [ amount, nil, rest ]
+    end
+
     # Adds to an item that's the same ingredient in a unit it can merge with, otherwise starts a new item.
     def merge_item(entry)
       item = items.detect { |existing| IngredientName.normalize(existing.name) == entry.name_key && Units.group(existing.unit) == entry.group } || items.build(name: entry.name)
