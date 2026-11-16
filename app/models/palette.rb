@@ -3,8 +3,10 @@
 # a tint, and two accents); this file only names them.
 # To add one: paste a block in that file and add a line here.
 class Palette
-  LIGHT = { "sunrise" => "Sunrise", "meadow" => "Meadow", "lagoon" => "Lagoon", "gruvbox" => "Gruvbox Light" }.freeze
-  DARK = { "ember" => "Ember", "deepsea" => "Deep Sea", "plum" => "Plum", "gruvboxdark" => "Gruvbox Dark" }.freeze
+  LIGHT = { "sunrise" => "Sunrise", "meadow" => "Meadow", "lagoon" => "Lagoon", "gruvbox" => "Gruvbox Light",
+            "latte" => "Catppuccin Latte", "rosepinedawn" => "Rosé Pine Dawn" }.freeze
+  DARK = { "ember" => "Ember", "deepsea" => "Deep Sea", "plum" => "Plum", "gruvboxdark" => "Gruvbox Dark",
+           "mocha" => "Catppuccin Mocha", "rosepine" => "Rosé Pine", "nord" => "Nord", "tokyonight" => "Tokyo Night", "everforest" => "Everforest" }.freeze
   APPEARANCES = { "auto" => "Match my device", "light" => "Light", "dark" => "Dark" }.freeze
 
   DEFAULT_LIGHT = "lagoon"

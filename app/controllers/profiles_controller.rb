@@ -1,4 +1,6 @@
 class ProfilesController < ApplicationController
+  rate_limit to: 10, within: 3.minutes, only: :destroy, with: -> { redirect_to profile_path, alert: "Try again later." }
+
   def show
     render Views::Profiles::Show.new(user: Current.user)
   end
