@@ -14,7 +14,7 @@ require "minitest/mock"
 
 class ActiveSupport::TestCase
   def create_user(name: "Cook", email: "#{name.downcase}@example.com")
-    User.create!(name:, email_address: email, password: "secret123")
+    User.create!(name:, email_address: email, password: "secret123", whats_new_seen_id: WhatsNew.latest_id) # caught up, so the "What's new" sheet stays out of the way
   end
 
   def create_recipe(user, name: "Soup", public: true, ingredients: [])

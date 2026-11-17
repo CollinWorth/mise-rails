@@ -11,6 +11,9 @@ class NewCookJourneySystemTest < JourneyTestCase
 
     # --- sign up lands on an empty recipe list
     sign_up(name: "Nora", email: "nora@example.com")
+    assert_text "What's new" # first timers are shown what's new, and can skip it
+    click_button "Close"
+    assert_no_selector "[data-controller~=sheet]"
     assert_text "No recipes yet"
 
     # --- write a recipe: ingredients with amounts, steps, shared publicly

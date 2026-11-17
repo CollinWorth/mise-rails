@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   resource :profile, only: %i[show update destroy]
   resource :password, only: :update
   resource :shortcut_key, only: %i[show create]
+  resource :whats_new, only: %i[show update], controller: :whats_new
   namespace :shortcuts do
     resources :grocery_items, only: :create
     resources :recipe_imports, only: :create

@@ -45,4 +45,6 @@ class User < ApplicationRecord
   def pantry_keys = pantry_items.pluck(:normalized_name)
 
   def following?(user) = following.exists?(user.id)
+
+  def saw_whats_new! = update_column(:whats_new_seen_id, [ whats_new_seen_id, WhatsNew.latest_id ].max)
 end

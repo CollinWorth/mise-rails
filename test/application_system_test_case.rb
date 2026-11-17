@@ -1,5 +1,9 @@
 require "test_helper"
 
+# The browser reports its time zone to the app, which goes by it for "today". Chromium would say UTC (so, in the evening
+# in California, already tomorrow); keep it in the zone the tests' own dates (Date.current) are in.
+ENV["TZ"] = "America/Los_Angeles"
+
 # Browser tests run in headless Chromium at phone size, since that is how the app is used.
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium, using: :headless_chrome, screen_size: [ 390, 844 ] do |options|

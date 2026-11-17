@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_16_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_16_210000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -218,6 +218,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_200000) do
     t.string "dark_theme", default: "ember", null: false
     t.string "time_zone"
     t.string "shortcut_token_digest"
+    t.integer "whats_new_seen_id", default: 0, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["shortcut_token_digest"], name: "index_users_on_shortcut_token_digest", unique: true
   end

@@ -83,7 +83,8 @@ class Components::Layouts::Application < Components::Base
             end
           end
         end
-        turbo_frame(id: "modal") # full-screen sheets (Components::Sheet) load in here
+        # full-screen sheets (Components::Sheet) load in here; while there is news a cook hasn't read, "What's new" opens in it
+        turbo_frame(id: "modal", src: (whats_new_path if @user && WhatsNew.unseen(@user).any?))
         TabBar(user: @user) if @user
       end
     end

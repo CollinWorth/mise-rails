@@ -55,6 +55,14 @@ class Views::Profiles::Show < Views::Base
 
       Card do
         CardHeader do
+          CardTitle { "What's new" }
+          CardDescription { "New things in Mise, from the latest." }
+        end
+        CardContent { SheetLink(href: whats_new_path(all: 1), variant: :outline) { "See what's new" } }
+      end
+
+      Card do
+        CardHeader do
           CardTitle { "Siri Shortcut" }
           CardDescription { "Say “Hey Siri, add to grocery list” and what you need goes on your list." }
         end

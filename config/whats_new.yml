@@ -1,0 +1,28 @@
+# What's new, shown once to each cook (tracked on their account, so a second phone or browser doesn't ask again).
+# To announce something: add an entry with the next id, newest last. Keep it to a sentence or two, and only list
+# things a cook can see and try. `path` (optional) adds a "Try it" link.
+- id: 1
+  date: 2026-11-13
+  title: Shop for the week in one tap
+  body: Planned some dinners? "Shop for this week" lists every ingredient so you can untick what you have. Tap "Always have" and it goes in your pantry, so it never lands on the list again.
+  path: /planned_meals
+- id: 2
+  date: 2026-11-16
+  title: A month at a glance
+  body: The planner has a calendar view now. Switch to Month to see every dinner you have planned, and tap a day to add or change one.
+  path: /planned_meals?view=month
+- id: 3
+  date: 2026-11-16
+  title: Move an item to another aisle
+  body: Grocery list put something in the wrong aisle? Tap the item, pick the right aisle, and it goes there.
+  path: /grocery_list
+- id: 4
+  date: 2026-11-16
+  title: More color themes
+  body: Catppuccin, Rosé Pine, Nord, Tokyo Night and Everforest join the themes. Pick a light and a dark one, or let Mise follow your phone.
+  path: /profile
+- id: 5
+  date: 2026-11-16
+  title: Days start where you are
+  body: Mise now uses your own time zone for "today" and your planner. It picks up your phone's, and you can choose one on your account page.
+  path: /profile
