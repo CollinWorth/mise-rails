@@ -24,7 +24,7 @@ gem "stimulus-rails"
 gem "tailwindcss-rails"
 gem "phlex-rails", "~> 2.4"
 # refract (a Phlex dependency) still uses Prism::MissingNode, which Prism 2 removed
-gem "prism", "< 2"
+gem "prism", "< 3"
 gem "tailwind_merge", "~> 1.5"
 # Only used to copy components in (bin/rails g ruby_ui:component ...); the copies live in app/components/ruby_ui
 gem "ruby_ui", "~> 1.6", group: :development
