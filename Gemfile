@@ -31,7 +31,7 @@ gem "ruby_ui", "~> 1.6", group: :development
 
 # --- Accounts, uploads and data ---
 gem "bcrypt", "~> 3.1.7"
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.2"
 # S3-compatible bucket for Active Storage in production
 gem "aws-sdk-s3", "~> 1.0", require: false
 gem "pagy", "~> 43.8"
