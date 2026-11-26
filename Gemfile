@@ -56,7 +56,7 @@ end
 
 group :test do
   gem "capybara", "~> 3.40"
-  gem "selenium-webdriver", "~> 4.52"
+  gem "selenium-webdriver", "~> 4.53"
   gem "minitest-mock", "~> 5.27"
   # Coverage report: COVERAGE=1 bin/rails test
   gem "simplecov", require: false
